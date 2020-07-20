@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "571000980591",
+    "firebase_url": "https://burger-and-grill-c0b7d.firebaseio.com",
+    "project_id": "burger-and-grill-c0b7d",
+    "storage_bucket": "burger-and-grill-c0b7d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:571000980591:android:0b291b9cd89af55b4eb99a",
+        "android_client_info": {
+          "package_name": "com.example.burgerandgrill"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "571000980591-b9ttirbuhbcj0vudrg2ct3kt17gbake7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBM56F1Evc5chniVhnKDAaoCAZ_IEVtoFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "571000980591-b9ttirbuhbcj0vudrg2ct3kt17gbake7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

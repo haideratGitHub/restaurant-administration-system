@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#333333"
+    android:orientation="vertical"
+    tools:context=".AddUser">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:fontFamily="@font/notosansbold"
+        android:text="ADD A NEW USER"
+        android:textColor="@android:color/white"
+        android:textSize="24dp"></TextView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:fontFamily="@font/notosansbold"
+        android:text="Enter Email:"
+        android:textColor="@android:color/black"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@color/colorAccent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textSize="20dp"></TextView>
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:inputType="textPersonName"
+        android:hint="email..."
+        android:textColor="@android:color/black"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@android:color/white"
+        android:padding="8dp"
+        android:textSize="18dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:fontFamily="@font/notosansbold"
+        android:text="Enter Password:"
+        android:textColor="@android:color/black"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@color/colorAccent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textSize="20dp"></TextView>
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:inputType="textPersonName"
+        android:hint="password (at least 6 characters)"
+        android:textColor="@android:color/black"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@android:color/white"
+        android:padding="8dp"
+        android:textSize="18dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:fontFamily="@font/notosansbold"
+        android:text="Select Type:"
+        android:textColor="@android:color/black"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@color/colorAccent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textSize="20dp"></TextView>
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/groupradio"
+        android:layout_marginLeft="20dp"
+        android:fontFamily="@font/notosansbold"
+        android:textColor="@color/colorAccent"
+        android:padding="5dp">
+        <RadioButton
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/radia_admin"
+            android:textColor="@color/colorAccent"
+            android:text="Admin"
+            android:textSize="20dp"/>
+
+        <RadioButton
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/radia_employee"
+            android:textColor="@color/colorAccent"
+            android:text="Employee"
+            android:textSize="20dp"/>
+    </RadioGroup>
+    <Button
+        android:id="@+id/save_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_margin="16dp"
+        android:fontFamily="@font/notosansbold"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:text="SAVE"
+        android:enabled="false"
+        android:textColor="@android:color/darker_gray"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@color/colorAccent"
+        android:padding="8dp"
+        android:textSize="20dp"></Button>
+
+    <ProgressBar
+        android:id="@+id/add_user_progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+</LinearLayout>
