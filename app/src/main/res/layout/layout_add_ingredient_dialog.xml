@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+    <EditText
+        android:id="@+id/ingredient_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/notosansbold"
+        android:hint="Name" />
+    <EditText
+        android:id="@+id/ingredient_quantity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ingredient_name"
+        android:layout_alignParentStart="true"
+        android:fontFamily="@font/notosansbold"
+        android:hint="Quantity Available"
+        android:inputType="number"
+         />
+    <TextView
+        android:id="@+id/unit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ingredient_quantity"
+        android:textSize="20dp"
+        android:text="UNIT"
+        android:padding="5dp"
+        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
+        >
+
+    </TextView>
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/unit"
+        android:layout_alignParentStart="true"
+        android:id="@+id/addingredient_groupradio"
+        android:layout_marginLeft="20dp"
+        android:fontFamily="@font/notosansbold"
+        android:textColor="@color/colorAccent"
+        android:padding="5dp">
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/units_per_item"
+            android:text="Units"
+            android:textSize="20dp"/>
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/grams"
+            android:text="Grams"
+            android:textSize="20dp"
+            />
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/miligram"
+            android:text="Millilitre (ml)"
+            android:textSize="20dp"/>
+
+    </RadioGroup>
+
+</RelativeLayout>
