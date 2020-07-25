@@ -143,7 +143,7 @@ public class AddMenuItem extends AppCompatActivity {
         List<String> n = Arrays.asList(tn);
         List<String> q = Arrays.asList(tq);
         List<String> u = Arrays.asList(tu);
-        MenuModel newMenuItem = new MenuModel(name,price,type,n,q,u);
+        MenuModel newMenuItem = new MenuModel(name,price,type,size,n,q,u);
         firebaseFirestore.collection("MENUITEM").add(newMenuItem)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override

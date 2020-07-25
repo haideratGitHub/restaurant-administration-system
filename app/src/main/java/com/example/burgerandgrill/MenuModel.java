@@ -9,6 +9,15 @@ public class MenuModel {
     String name;
     String price;
     String type;
+    String size;
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
 
     //ingredient list in 3 maps - corresponding values name,quantity,unit
     List<String> iname;
@@ -39,7 +48,7 @@ public class MenuModel {
         this.iunit = iunit;
     }
 
-    public MenuModel(String name, String price, String type, List<String> iname, List<String> iquantity, List<String> iunit) {
+    public MenuModel(String name, String price, String type, String size, List<String> iname, List<String> iquantity, List<String> iunit) {
         this.name = name;
         this.price = price;
         this.type = type;
