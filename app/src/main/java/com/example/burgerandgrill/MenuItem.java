@@ -1,9 +1,9 @@
 package com.example.burgerandgrill;
 
 public class MenuItem {
-    private int mImageResource;
-    private String mText1;
-    private String mText2;
+    private int mImageResource; //image of burger,sandwich or wrap
+    private String mText1; //name of menu item
+    private String mText2; //price of menu item
     public MenuItem(int imageResource, String text1, String text2) {
         mImageResource = imageResource;
         mText1 = text1;

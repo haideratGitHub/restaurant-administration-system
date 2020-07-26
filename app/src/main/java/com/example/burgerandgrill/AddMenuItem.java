@@ -52,7 +52,6 @@ public class AddMenuItem extends AppCompatActivity {
 
 
     private FirebaseFirestore firebaseFirestore;
-    private static final String ICOLLECTION = "INGREDIENT";
     final ArrayList<IngredientModel> ingredientList = new ArrayList<IngredientModel>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +116,7 @@ public class AddMenuItem extends AppCompatActivity {
         String price = itemPrice.getText().toString();
         //final List<Map<String,String>>  iList = new List<Map<String, String>>()
 
-        //create 3 maps - name,quantity,unit
+        //create 3 string arrays - name,quantity,unit
         String[] tn = new String[ingredientList.size()];
         String[] tq = new String[ingredientList.size()];
         String[] tu = new String[ingredientList.size()];

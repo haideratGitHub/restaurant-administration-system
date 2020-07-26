@@ -52,6 +52,7 @@ public class MenuModel {
         this.name = name;
         this.price = price;
         this.type = type;
+        this.size = size;
         this.iname = iname;
         this.iquantity = iquantity;
         this.iunit = iunit;

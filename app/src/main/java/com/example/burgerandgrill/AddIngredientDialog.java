@@ -5,8 +5,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -40,25 +42,27 @@ public class AddIngredientDialog extends AppCompatDialogFragment {
                 .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String name = editIngredientName.getText().toString();
-                        String quantity = editIngredientQuantity.getText().toString();
-                        final RadioButton[] radioButton = new RadioButton[1];
-                        editIngredientQuantityUnit.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                            @Override
-                            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                                radioButton[0] = (RadioButton)group.findViewById(checkedId);
-                            }
-                        });
-                        int selectedId = editIngredientQuantityUnit.getCheckedRadioButtonId();
-                        if(selectedId == -1){
-                            //TO DO - ask user to do select some unit
-                        }else{
+                        if(checkInputs()){
+                            String name = editIngredientName.getText().toString();
+                            String quantity = editIngredientQuantity.getText().toString();
+                            final RadioButton[] radioButton = new RadioButton[1];
+                            editIngredientQuantityUnit.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                                @Override
+                                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                                    radioButton[0] = (RadioButton)group.findViewById(checkedId);
+                                }
+                            });
+                            int selectedId = editIngredientQuantityUnit.getCheckedRadioButtonId();
                             selectedRadioButton = (RadioButton)editIngredientQuantityUnit.findViewById(selectedId);
+                            String unit = selectedRadioButton.getText().toString();
+
+
+                            listener.applyTexts(name, quantity, unit);
                         }
-                        String unit = selectedRadioButton.getText().toString();
+                        else{
+//TODO - diable add button and do not close dialog
+                        }
 
-
-                        listener.applyTexts(name, quantity, unit);
                     }
                 });
 
@@ -82,5 +86,28 @@ public class AddIngredientDialog extends AppCompatDialogFragment {
 
     public interface ExampleDialogListener {
         void applyTexts(String s, String name, String quantity);
+    }
+
+
+    public boolean checkInputs(){
+        if(!TextUtils.isEmpty(editIngredientName.getText())){
+            if (!TextUtils.isEmpty(editIngredientQuantity.getText())){
+                if(editIngredientQuantityUnit.getCheckedRadioButtonId() != -1){
+                    return true;
+                }
+                else{
+                    editIngredientName.setError("Enter ingredient quantity unit!");
+                    return false;
+                }
+            }
+            else {
+                editIngredientName.setError("Enter ingredient quantity available in stock!");
+                return false;
+            }
+        }
+        else{
+            editIngredientName.setError("Enter ingredient name!");
+            return false;
+        }
     }
 }

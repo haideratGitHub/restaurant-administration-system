@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 public class Menu extends AppCompatActivity implements AddIngredientDialog.ExampleDialogListener{
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private MenuListAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     CardView addMenuItem;
@@ -97,6 +98,13 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
                             mAdapter = new MenuListAdapter(exampleList);
                             mRecyclerView.setLayoutManager(mLayoutManager);
                             mRecyclerView.setAdapter(mAdapter);
+
+                            mAdapter.setOnItemClickListener(new MenuListAdapter.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(int position) {
+                                    checkfun();//display dialog with clicked menu item information
+                                }
+                            });
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -108,6 +116,9 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
 
         //exampleList.add(new MenuItem(R.drawable.burger, "The Ultimate mold", "Rs. 350 (tap for details)"));
 
+    }
+    public void checkfun(){
+        Toast.makeText(this,"Clicked",Toast.LENGTH_SHORT).show();
     }
 
     private void gotoAddMenuItem(){

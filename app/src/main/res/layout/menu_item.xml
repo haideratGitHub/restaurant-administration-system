@@ -43,6 +43,7 @@
                 android:textSize="15dp" />
         </LinearLayout>
         <Button
+            android:id="@+id/edit_menu_item"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:background="@drawable/edit"
@@ -52,6 +53,7 @@
             ></Button>
 
         <Button
+            android:id="@+id/delete_menu_item"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:background="@drawable/delete"
