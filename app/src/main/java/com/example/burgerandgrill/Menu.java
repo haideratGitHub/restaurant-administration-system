@@ -81,7 +81,7 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
 
     }
     public void checkfun(){
-        Toast.makeText(this,"Clicked",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"Sorry! This feature is under development",Toast.LENGTH_SHORT).show();
     }
 
     private void getDataFromFirebase(){
@@ -101,7 +101,6 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
                             List<String> iunit = (List<String>) documentSnapshot.get("iquantity");
 
                             //TODO for use in display "tap fo details" info
-                            //update
 
 
                             if(type.contains("Burger")){

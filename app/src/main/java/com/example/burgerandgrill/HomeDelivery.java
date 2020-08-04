@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,13 +19,17 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -154,6 +159,14 @@ public class HomeDelivery extends AppCompatActivity {
             }
         });
 
+        applyDiscount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                computeDiscount();
+                discount.setEnabled(false);
+                discount.setFocusable(false);
+            }
+        });
 
     }
     private void showToast(){
@@ -250,19 +263,80 @@ public class HomeDelivery extends AppCompatActivity {
         });
     }
     private void saveOrderInFirebase(){
-        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        Date cal = Calendar.getInstance().getTime();
+        String date = DateFormat.getDateInstance(DateFormat.FULL).format(cal.getTime());
         //As we are in TakeOrder so order type must be "Order", not "Delivery"
         String type = "Delivery";
+        String discountGiven = discount.getText().toString();
+        if(discountGiven.equals("")){
+            discountGiven = "0";
+        }
         String customerName = cusName.getText().toString();
         String customerPhoneNumber = cusPhNumber.getText().toString();
         String customerAddress = cusAddress.getText().toString();
+        String finalBill;
+        if(billAfterDiscount == 0){
+            //there is no discount given and we can save total bill as final
+            finalBill = String.valueOf(totalBill);
+        }else{
+            //there is discount given so now we will save total bill after discount in final bill
+            finalBill = String.valueOf(billAfterDiscount);
+        }
         if(validateOrder()){
             Toast.makeText(this,"Order Placed",Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(this,"Order Placed!! Shortage in inventory!!",Toast.LENGTH_SHORT).show();
         }
+        String[] productName = new String[orderList.size()];
+        String[] productType = new String[orderList.size()];
+        String[] count = new String[orderList.size()];
+        String[] price = new String[orderList.size()];
+        for(int i=0; i<orderList.size();i++){
+            productName[i] = orderList.get(i).getProductName();
+            productType[i] = orderList.get(i).getProductType();
+            count[i] = orderList.get(i).getCount();
+            price[i] = orderList.get(i).getPrice();
+        }
+
+        List<String> pn = Arrays.asList(productName);
+        List<String> pt = Arrays.asList(productType);
+        List<String> c = Arrays.asList(count);
+        List<String> pr = Arrays.asList(price);
+
+        DeliverySaveModel deliverySaveModel = new DeliverySaveModel(date,type,discountGiven,finalBill,customerName,customerPhoneNumber,customerAddress,pn,pt,c,pr);
+        firebaseFirestore = firebaseFirestore.getInstance();
+        firebaseFirestore.collection("SALES").add(deliverySaveModel)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        success();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("error",e.toString());
+                    }
+                });
 
 
+    }
+    private void success(){
+        int i = 0;
+        while (!orderList.isEmpty()){
+            orderList.remove(i); //for updating order list view
+        }
+        if(orderList.isEmpty()){
+            discount.setText("");
+            cusName.setText("");
+            cusAddress.setText("");
+            cusPhNumber.setText("");
+            discount.setHint("Discount");
+            total.setText("Rs. 0");
+            mAdapterForCuurentOrder = new CurrentOrderListAdapter(orderList);
+            mRecyclerViewForCuurentOrder.setLayoutManager(mLayoutManagerForCuurentOrder);
+            mRecyclerViewForCuurentOrder.setAdapter(mAdapterForCuurentOrder);
+        }
     }
     private boolean validateOrder(){
         final boolean[] validate = {true};
@@ -312,9 +386,9 @@ public class HomeDelivery extends AppCompatActivity {
         return validate[0];
     }
     private boolean checkInputs(){
-        if(!TextUtils.isEmpty(cusName.toString())){
-            if(!TextUtils.isEmpty(cusPhNumber.toString())){
-                if(!TextUtils.isEmpty(cusAddress.toString())){
+        if(!TextUtils.isEmpty(cusName.getText().toString())){
+            if(!TextUtils.isEmpty(cusPhNumber.getText().toString())){
+                if(!TextUtils.isEmpty(cusAddress.getText().toString())){
                     return true;
                 }else{
                     Toast.makeText(this,"Enter customer address!!", Toast.LENGTH_SHORT).show();
@@ -327,6 +401,23 @@ public class HomeDelivery extends AppCompatActivity {
         }else{
             Toast.makeText(this,"Enter customer name!!", Toast.LENGTH_SHORT).show();
             return false;
+        }
+    }
+    private void computeDiscount(){
+        if(!TextUtils.isEmpty(discount.getText())){
+            int disc = Integer.valueOf(discount.getText().toString());
+            if(disc > 0 && disc < 100){
+                int priceReduce = (int) (((1.0*disc)/100)*totalBill);
+
+                billAfterDiscount = totalBill - priceReduce;
+                total.setText("Rs. " + String.valueOf(billAfterDiscount));
+            }
+            else{
+                Toast.makeText(this,"invalid discount value!!",Toast.LENGTH_SHORT);
+            }
+        }
+        else{
+            Toast.makeText(this,"Enter discount to apply!!",Toast.LENGTH_SHORT);
         }
     }
 }
