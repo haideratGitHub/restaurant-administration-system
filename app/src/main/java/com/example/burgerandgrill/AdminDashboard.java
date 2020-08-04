@@ -16,6 +16,8 @@ public class AdminDashboard extends AppCompatActivity {
     private CardView sales;
     private CardView settings;
     private CardView menu;
+    private CardView takeOrder;
+    private CardView homeDelivery;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +28,8 @@ public class AdminDashboard extends AppCompatActivity {
         sales = findViewById(R.id.sales);
         settings = findViewById(R.id.settings);
         menu = findViewById(R.id.create_menu);
+        takeOrder = findViewById(R.id.take_order);
+        homeDelivery = findViewById(R.id.home_delivery);
 
 
         addUser.setOnClickListener(new View.OnClickListener() {
@@ -59,6 +63,19 @@ public class AdminDashboard extends AppCompatActivity {
                 gotoMenu();
             }
         });
+        takeOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gotoTakeOrder();
+            }
+        });
+        homeDelivery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gotoHomeDelivery();
+            }
+        });
+
     }
     private void gotoAddUser(){
         final Intent intent = new Intent(this,AddUser.class);
@@ -78,6 +95,14 @@ public class AdminDashboard extends AppCompatActivity {
     }
     private void gotoMenu(){
         final Intent intent = new Intent(this,Menu.class);
+        startActivity(intent);
+    }
+    private void gotoTakeOrder(){
+        final Intent intent = new Intent(this,TakeOrder.class);
+        startActivity(intent);
+    }
+    private void gotoHomeDelivery(){
+        final Intent intent = new Intent(this,HomeDelivery.class);
         startActivity(intent);
     }
 

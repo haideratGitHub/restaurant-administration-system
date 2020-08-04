@@ -32,7 +32,7 @@
                 android:textColor="@android:color/black"
                 android:textSize="18dp"
                 android:textStyle="bold"
-                 />
+                />
 
             <TextView
                 android:id="@+id/textView2"
@@ -42,28 +42,29 @@
                 android:text="Line 2"
                 android:textSize="15dp" />
         </LinearLayout>
+
         <Button
-            android:id="@+id/edit_menu_item"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:background="@drawable/edit"
+            android:id="@+id/add_to_order"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/add"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:padding="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="15dp"
+            ></Button>
+
+        <Button
+            android:id="@+id/remove_from_order"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/remove"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:padding="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
             ></Button>
 
-
-        <Button
-            android:id="@+id/delete_menu_item"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:background="@drawable/delete"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:padding="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            ></Button>
 
     </LinearLayout>
 

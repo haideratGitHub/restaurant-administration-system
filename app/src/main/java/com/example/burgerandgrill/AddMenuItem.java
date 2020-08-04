@@ -129,7 +129,10 @@ public class AddMenuItem extends AppCompatActivity {
             TextView iunit = view.findViewById(R.id.ith_ingredient_quantity_unit);
 
             String iQuantity = iquantity.getText().toString();
-            if(!iQuantity.equals("Quantity")){ //means some quantity must be there
+            if(iQuantity.equals("")){
+                iQuantity = "0";
+            }
+            if(!iQuantity.equals("")){ //means some quantity must be there
                 String iName = iname.getText().toString();
                 String iUnit = iunit.getText().toString();
                 tn[index] = iName;
@@ -170,7 +173,8 @@ public class AddMenuItem extends AppCompatActivity {
         for(int i=0; i<ingredientList.size(); i++){
             View view = mRecyclerView.getChildAt(i);
             EditText iquantity = view.findViewById(R.id.ith_ingredient_quantity);
-            iquantity.setText("Quantity");
+            iquantity.setText("");
+            iquantity.setHint("Quantity");
         }
         Toast.makeText(this,"New Menu Item Added Successfully",Toast.LENGTH_SHORT).show();
     }
