@@ -229,10 +229,10 @@ public class HomeDelivery extends AppCompatActivity {
                                 orderList.get(i).setCount(String.valueOf(ctemp));
 
                                 int ptemp = Integer.parseInt(orderList.get(i).getPrice());
-                                ptemp = ptemp - Integer.parseInt(exampleList.get(i).getText2());
+                                ptemp = ptemp - Integer.parseInt(exampleList.get(position).getText2());
                                 orderList.get(i).setPrice(String.valueOf(ptemp));
 
-                                int temp = Integer.parseInt(exampleList.get(i).getText2());
+                                int temp = Integer.parseInt(exampleList.get(position).getText2());
                                 totalBill = totalBill - temp;
                                 total.setText(String.valueOf(totalBill));
                             }
@@ -261,6 +261,7 @@ public class HomeDelivery extends AppCompatActivity {
         }else{
             Toast.makeText(this,"Order Placed!! Shortage in inventory!!",Toast.LENGTH_SHORT).show();
         }
+
 
     }
     private boolean validateOrder(){

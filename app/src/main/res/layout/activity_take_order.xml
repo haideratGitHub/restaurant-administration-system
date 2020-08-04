@@ -124,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/notosansbold"
-                android:text="0 Rs."
+                android:text="Rs. 0"
                 android:textColor="@android:color/black"
                 android:background="@drawable/round_corners"
                 android:backgroundTint="@color/colorAccent"

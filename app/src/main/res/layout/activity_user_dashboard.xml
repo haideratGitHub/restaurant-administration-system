@@ -28,20 +28,19 @@
             android:columnCount="2"
             android:layout_margin="5dp"
             android:alignmentMode="alignMargins"
-
             android:layout_gravity="center_horizontal"
             android:columnOrderPreserved="false"
             >
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/add_user"
+                android:id="@+id/take_order_user"
                 android:layout_width="170dp"
                 android:layout_height="170dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="5dp"
                 app:cardBackgroundColor="@android:color/white"
                 android:background="@drawable/round_corners"
-                android:backgroundTint="@color/colorAccent"
+                android:backgroundTint="#FF66E5"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:layout_margin="10dp">
                 <LinearLayout
@@ -50,8 +49,8 @@
                     android:orientation="vertical"
                     android:gravity="center">
                     <ImageView
-                        android:layout_width="60dp"
-                        android:layout_height="51dp"
+                        android:layout_width="70dp"
+                        android:layout_height="61dp"
                         android:src="@drawable/order"
                         >
                     </ImageView>
@@ -69,14 +68,14 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/inventory"
+                android:id="@+id/home_delivery_user"
                 android:layout_width="170dp"
                 android:layout_height="170dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="5dp"
                 app:cardBackgroundColor="@android:color/white"
                 android:background="@drawable/round_corners"
-                android:backgroundTint="@color/colorAccent"
+                android:backgroundTint="#3498DB"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:layout_margin="10dp">
                 <LinearLayout
@@ -85,8 +84,8 @@
                     android:orientation="vertical"
                     android:gravity="center">
                     <ImageView
-                        android:layout_width="60dp"
-                        android:layout_height="51dp"
+                        android:layout_width="70dp"
+                        android:layout_height="61dp"
                         android:src="@drawable/delivery">
                     </ImageView>
                     <TextView
@@ -101,40 +100,6 @@
                     </TextView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-            <androidx.cardview.widget.CardView
-                android:id="@+id/settings"
-                android:layout_width="170dp"
-                android:layout_height="170dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="5dp"
-                app:cardBackgroundColor="@android:color/white"
-                android:background="@drawable/round_corners"
-                android:backgroundTint="@color/colorAccent"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:layout_margin="10dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="60dp"
-                        android:layout_height="51dp"
-                        android:src="@drawable/settings">
-                    </ImageView>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="SETTINGS"
-                        android:textSize="16dp"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorPrimary"
-                        android:fontFamily="@font/notosansbold"
-                        android:layout_marginTop="12dp">
-                    </TextView>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
         </GridLayout>
     </LinearLayout>
 </ScrollView>

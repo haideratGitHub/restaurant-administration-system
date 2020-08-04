@@ -27,6 +27,7 @@ public class AdminDashboard extends AppCompatActivity {
         inventory = findViewById(R.id.inventory);
         sales = findViewById(R.id.sales);
         settings = findViewById(R.id.settings);
+        settings.setVisibility(View.GONE);
         menu = findViewById(R.id.create_menu);
         takeOrder = findViewById(R.id.take_order);
         homeDelivery = findViewById(R.id.home_delivery);

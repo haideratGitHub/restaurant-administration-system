@@ -18,6 +18,17 @@
             android:textSize="24dp"
             android:fontFamily="@font/notosansbold"
             android:layout_margin="20dp"></TextView>
+        <Button
+            android:id="@+id/date_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:text="dummy"
+            android:background="@drawable/round_corners"
+            android:backgroundTint="@color/colorAccent"
+            android:textColor="@android:color/black"
+            ></Button>
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"

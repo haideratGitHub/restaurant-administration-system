@@ -28,6 +28,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -172,6 +173,8 @@ public class TakeOrder extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 computeDiscount();
+                discount.setEnabled(false);
+                discount.setFocusable(false);
             }
         });
 
@@ -212,7 +215,7 @@ public class TakeOrder extends AppCompatActivity {
                     orderList.add(new OrderModel(name,size,count,price,exampleList.get(position).getIname(),exampleList.get(position).getIquantity(), exampleList.get(position).getIunit()));
                     int temp = Integer.parseInt(price);
                     totalBill = totalBill + temp;
-                    total.setText(String.valueOf(totalBill));
+                    total.setText("Rs. " + String.valueOf(totalBill));
                 }
                 if(orderList.size() == 1){
                     placeOrder.setVisibility(View.VISIBLE);
@@ -245,12 +248,12 @@ public class TakeOrder extends AppCompatActivity {
                                 orderList.get(i).setCount(String.valueOf(ctemp));
 
                                 int ptemp = Integer.parseInt(orderList.get(i).getPrice());
-                                ptemp = ptemp - Integer.parseInt(exampleList.get(i).getText2());
+                                ptemp = ptemp - Integer.parseInt(exampleList.get(position).getText2());
                                 orderList.get(i).setPrice(String.valueOf(ptemp));
 
-                                int temp = Integer.parseInt(exampleList.get(i).getText2());
+                                int temp = Integer.parseInt(exampleList.get(position).getText2());
                                 totalBill = totalBill - temp;
-                                total.setText(String.valueOf(totalBill));
+                                total.setText("Rs. " + String.valueOf(totalBill));
                             }
 
                         }
@@ -266,16 +269,77 @@ public class TakeOrder extends AppCompatActivity {
         });
     }
     private void saveOrderInFirebase(){
-        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        //String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         //As we are in TakeOrder so order type must be "Order", not "Delivery"
+        Date cal = Calendar.getInstance().getTime();
+        String date = DateFormat.getDateInstance(DateFormat.FULL).format(cal.getTime());
         String type = "Order";
+        String discountGiven = discount.getText().toString();
+        if(discountGiven.equals("")){
+            discountGiven = "0";
+        }
+        String finalBill;
+        if(billAfterDiscount == 0){
+            //there is no discount given and we can save total bill as final
+            finalBill = String.valueOf(totalBill);
+        }else{
+            //there is discount given so now we will save total bill after discount in final bill
+            finalBill = String.valueOf(billAfterDiscount);
+        }
         if(validateOrder()){
             Toast.makeText(this,"Order Placed",Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(this,"Order Placed!! Shortage in inventory!!",Toast.LENGTH_SHORT).show();
         }
 
+        String[] productName = new String[orderList.size()];
+        String[] productType = new String[orderList.size()];
+        String[] count = new String[orderList.size()];
+        String[] price = new String[orderList.size()];
 
+        for(int i=0; i<orderList.size();i++){
+            productName[i] = orderList.get(i).getProductName();
+            productType[i] = orderList.get(i).getProductType();
+            count[i] = orderList.get(i).getCount();
+            price[i] = orderList.get(i).getPrice();
+        }
+
+        List<String> pn = Arrays.asList(productName);
+        List<String> pt = Arrays.asList(productType);
+        List<String> c = Arrays.asList(count);
+        List<String> pr = Arrays.asList(price);
+
+        OrderSaveModel orderSaveModel = new OrderSaveModel(date,type,discountGiven,finalBill,pn,pt,c,pr);
+        firebaseFirestore = firebaseFirestore.getInstance();
+        firebaseFirestore.collection("SALES").add(orderSaveModel)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        success();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("error",e.toString());
+                    }
+                });
+
+    }
+
+    private void success(){
+        int i = 0;
+        while (!orderList.isEmpty()){
+            orderList.remove(i); //for updating order list view
+        }
+        if(orderList.isEmpty()){
+            discount.setText("");
+            discount.setHint("Discount");
+            total.setText("Rs. 0");
+            mAdapterForCuurentOrder = new CurrentOrderListAdapter(orderList);
+            mRecyclerViewForCuurentOrder.setLayoutManager(mLayoutManagerForCuurentOrder);
+            mRecyclerViewForCuurentOrder.setAdapter(mAdapterForCuurentOrder);
+        }
     }
 
     private boolean validateOrder(){
