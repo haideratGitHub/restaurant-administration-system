@@ -19,39 +19,42 @@
             android:textColor="@android:color/white"
             android:textSize="24dp"
             android:fontFamily="@font/notosansbold"
-            android:layout_margin="20dp"></TextView>
+            android:layout_margin="20dp"
+            ></TextView>
 
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:rowCount="2"
             android:columnCount="2"
             android:layout_margin="5dp"
             android:alignmentMode="alignMargins"
-            android:layout_gravity="center_horizontal"
             android:columnOrderPreserved="false"
-            >
+            android:layout_gravity="center"
 
+            >
             <androidx.cardview.widget.CardView
                 android:id="@+id/add_user"
-                android:layout_width="170dp"
-                android:layout_height="170dp"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="5dp"
-                app:cardBackgroundColor="@android:color/white"
                 android:background="@drawable/round_corners"
                 android:backgroundTint="#E74C3C"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:layout_margin="10dp">
+                android:layout_margin="10dp"
+                app:cardElevation="5dp"
+                app:cardBackgroundColor="@android:color/white">
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:layout_gravity="center">
                     <ImageView
                         android:layout_width="70dp"
                         android:layout_height="61dp"
                         android:src="@drawable/adduser"
+                        android:layout_margin="10dp"
                         >
                     </ImageView>
                     <TextView
@@ -62,15 +65,16 @@
                         android:textStyle="bold"
                         android:textColor="@color/colorPrimary"
                         android:fontFamily="@font/notosansbold"
-                        android:layout_marginTop="12dp">
+                        android:padding="10dp">
                     </TextView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/inventory"
-                android:layout_width="170dp"
-                android:layout_height="170dp"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="match_parent"
+
                 app:cardCornerRadius="12dp"
                 app:cardElevation="5dp"
                 app:cardBackgroundColor="@android:color/white"
@@ -82,11 +86,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:layout_gravity="center">
                     <ImageView
                         android:layout_width="70dp"
                         android:layout_height="61dp"
-                        android:src="@drawable/inventory">
+                        android:src="@drawable/inventory"
+                        android:layout_margin="10dp">
                     </ImageView>
                     <TextView
                         android:layout_width="wrap_content"
@@ -96,15 +102,16 @@
                         android:textStyle="bold"
                         android:textColor="@color/colorPrimary"
                         android:fontFamily="@font/notosansbold"
-                        android:layout_marginTop="12dp">
+                        android:padding="10dp">
                     </TextView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/sales"
-                android:layout_width="170dp"
-                android:layout_height="170dp"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="5dp"
                 app:cardBackgroundColor="@android:color/white"
@@ -120,7 +127,8 @@
                     <ImageView
                         android:layout_width="70dp"
                         android:layout_height="61dp"
-                        android:src="@drawable/sales">
+                        android:src="@drawable/sales"
+                        android:layout_margin="10dp">
                     </ImageView>
                     <TextView
                         android:layout_width="wrap_content"
@@ -130,15 +138,16 @@
                         android:textStyle="bold"
                         android:textColor="@color/colorPrimary"
                         android:fontFamily="@font/notosansbold"
-                        android:layout_marginTop="12dp">
+                        android:padding="10dp">
                     </TextView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/create_menu"
-                android:layout_width="170dp"
-                android:layout_height="170dp"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="match_parent"
+
                 app:cardCornerRadius="12dp"
                 app:cardElevation="5dp"
                 app:cardBackgroundColor="@android:color/white"
@@ -154,7 +163,8 @@
                     <ImageView
                         android:layout_width="70dp"
                         android:layout_height="61dp"
-                        android:src="@drawable/list">
+                        android:src="@drawable/list"
+                        android:layout_margin="10dp">
                     </ImageView>
                     <TextView
                         android:layout_width="wrap_content"
@@ -164,15 +174,17 @@
                         android:textStyle="bold"
                         android:textColor="@color/colorPrimary"
                         android:fontFamily="@font/notosansbold"
-                        android:layout_marginTop="12dp">
+
+                        android:padding="10dp">
                     </TextView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/take_order"
-                android:layout_width="170dp"
-                android:layout_height="170dp"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="5dp"
                 app:cardBackgroundColor="@android:color/white"
@@ -189,6 +201,7 @@
                         android:layout_width="70dp"
                         android:layout_height="61dp"
                         android:src="@drawable/order"
+                        android:layout_margin="10dp"
                         >
                     </ImageView>
                     <TextView
@@ -199,15 +212,17 @@
                         android:textStyle="bold"
                         android:textColor="@color/colorPrimary"
                         android:fontFamily="@font/notosansbold"
-                        android:layout_marginTop="12dp">
+
+                        android:padding="10dp">
                     </TextView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/home_delivery"
-                android:layout_width="170dp"
-                android:layout_height="170dp"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="match_parent"
+
                 app:cardCornerRadius="12dp"
                 app:cardElevation="5dp"
                 app:cardBackgroundColor="@android:color/white"
@@ -223,7 +238,8 @@
                     <ImageView
                         android:layout_width="70dp"
                         android:layout_height="61dp"
-                        android:src="@drawable/delivery">
+                        android:src="@drawable/delivery"
+                        android:layout_margin="10dp">
                     </ImageView>
                     <TextView
                         android:layout_width="wrap_content"
@@ -233,10 +249,11 @@
                         android:textStyle="bold"
                         android:textColor="@color/colorPrimary"
                         android:fontFamily="@font/notosansbold"
-                        android:layout_marginTop="12dp">
+                        android:padding="10dp">
                     </TextView>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/settings"
                 android:layout_width="170dp"

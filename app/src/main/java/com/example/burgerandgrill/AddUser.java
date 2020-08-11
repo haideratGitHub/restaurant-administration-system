@@ -3,9 +3,13 @@ package com.example.burgerandgrill;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -19,14 +23,19 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class AddUser extends AppCompatActivity {
 
+    private Button viewAllUsers;
     private EditText username;
     private EditText password;
     private RadioGroup radioGroup;
@@ -34,11 +43,14 @@ public class AddUser extends AppCompatActivity {
     private ProgressBar progressBar;
     private FirebaseFirestore firebaseFirestore;
     private String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+.[a-z]+";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_user);
 
+        viewAllUsers = findViewById(R.id.view_all_users);
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
         radioGroup = findViewById(R.id.groupradio);
@@ -46,6 +58,10 @@ public class AddUser extends AppCompatActivity {
         progressBar = findViewById(R.id.add_user_progressBar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
+        upArrow.setColorFilter(Color.parseColor("#ffcc0000"), PorterDuff.Mode.SRC_ATOP);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+
 
         username.addTextChangedListener(new TextWatcher() {
             @Override
@@ -92,7 +108,13 @@ public class AddUser extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(username.getText().toString().matches(emailPattern)){
+                /**
+                 * username.getText().toString().matches(emailPattern)
+                 * removing email pattern verification from login
+                 * now username will be used to login
+                 */
+
+                if(true){
                     if(password.getText().length() >= 6){
                         int selectedId = radioGroup.getCheckedRadioButtonId();
                         if(selectedId == -1){
@@ -133,6 +155,20 @@ public class AddUser extends AppCompatActivity {
 
             }
         });
+        viewAllUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gotoViewAllUsers();
+            }
+        });
+    }
+
+    private void gotoViewAllUsers(){
+        final ArrayList<String> usersList = new ArrayList<>();
+
+
+        Intent intent = new Intent(this,ViewAllUsers.class);
+        startActivity(intent);
     }
 
     private void success(){
@@ -152,7 +188,6 @@ public class AddUser extends AppCompatActivity {
     private void showRadioButtonToast(){
         Toast.makeText(this,"Please select user type!!",Toast.LENGTH_SHORT).show();
     }
-
 
     private void checkInputs(){
         if(!TextUtils.isEmpty(username.getText())){

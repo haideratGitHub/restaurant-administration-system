@@ -11,10 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".HomeDelivery"
-            android:parentActivityName=".Menu"></activity>
-        <activity android:name=".TakeOrder"
-            android:parentActivityName=".Menu"/>
+        <activity android:name=".ViewAllUsers"
+            android:parentActivityName=".AddUser"></activity>
+        <activity
+            android:name=".HomeDelivery"
+            android:parentActivityName=".Menu" />
+        <activity
+            android:name=".TakeOrder"
+            android:parentActivityName=".Menu" />
         <activity
             android:name=".AddMenuItem"
             android:parentActivityName=".Menu" />
@@ -22,8 +26,9 @@
             android:name=".Menu"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".Settings" />
-        <activity android:name=".Sales"
-            android:parentActivityName=".Menu"/>
+        <activity
+            android:name=".Sales"
+            android:parentActivityName=".Menu" />
         <activity
             android:name=".Inventory"
             android:parentActivityName=".Menu" />

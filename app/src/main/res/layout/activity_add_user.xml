@@ -8,21 +8,38 @@
     android:orientation="vertical"
     tools:context=".AddUser">
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:fontFamily="@font/notosansbold"
-        android:text="ADD A NEW USER"
-        android:textColor="@android:color/white"
-        android:textSize="24dp"></TextView>
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:fontFamily="@font/notosansbold"
+            android:text="ADD A NEW USER"
+            android:textColor="@android:color/white"
+            android:textSize="24dp"></TextView>
+        <Button
+            android:id="@+id/view_all_users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_16sdp"
+            android:text="view all"
+            android:textColor="@color/colorAccent"
+            android:backgroundTint="@android:color/black"
+            android:background="@drawable/round_corners"
+            android:foreground="?attr/selectableItemBackgroundBorderless">
+        </Button>
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:fontFamily="@font/notosansbold"
-        android:text="Enter Email:"
+        android:text="Enter Username:"
         android:textColor="@android:color/black"
         android:background="@drawable/round_corners"
         android:backgroundTint="@color/colorAccent"
@@ -37,7 +54,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:inputType="textPersonName"
-        android:hint="email..."
+        android:hint="username..."
         android:textColor="@android:color/black"
         android:background="@drawable/round_corners"
         android:backgroundTint="@android:color/white"
@@ -108,7 +125,8 @@
     </RadioGroup>
     <Button
         android:id="@+id/save_user"
-        android:layout_width="match_parent"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:layout_margin="16dp"
@@ -119,7 +137,6 @@
         android:textColor="@android:color/darker_gray"
         android:background="@drawable/round_corners"
         android:backgroundTint="@color/colorAccent"
-        android:padding="8dp"
         android:textSize="20dp"></Button>
 
     <ProgressBar

@@ -54,7 +54,12 @@ public class CurrentOrderListAdapter extends RecyclerView.Adapter<CurrentOrderLi
             holder.mNameView.setText(currentItem.getProductName());
         }
         holder.mCountView.setText(currentItem.getCount());
-        holder.mPriceView.setText("Rs. " + currentItem.getPrice());
+        if(currentItem.getPrice().equals("admin") || currentItem.getPrice().equals("Employee")){
+            holder.mPriceView.setText(currentItem.getPrice());
+        }else{
+            holder.mPriceView.setText("Rs. " + currentItem.getPrice());
+        }
+
     }
 
     @Override
