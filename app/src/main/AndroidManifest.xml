@@ -3,6 +3,7 @@
     package="com.example.burgerandgrill">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <application
         android:allowBackup="true"
@@ -11,8 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ViewAllUsers"
-            android:parentActivityName=".AddUser"></activity>
+        <activity android:name=".CouponCode"
+            android:parentActivityName=".Menu"></activity>
+        <activity
+            android:name=".ViewAllUsers"
+            android:parentActivityName=".AddUser" />
         <activity
             android:name=".HomeDelivery"
             android:parentActivityName=".Menu" />

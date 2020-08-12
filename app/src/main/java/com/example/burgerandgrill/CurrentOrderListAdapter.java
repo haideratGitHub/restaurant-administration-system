@@ -47,19 +47,29 @@ public class CurrentOrderListAdapter extends RecyclerView.Adapter<CurrentOrderLi
     public void onBindViewHolder(CurrentOrderListAdapter.ExampleViewHolder holder, int position) {
         OrderModel currentItem = mExampleList.get(position);
 
-        if(!currentItem.getProductType().equals("None")){
-            holder.mNameView.setText(currentItem.getProductName() + " - " + currentItem.getProductType());
-        }
-        else {
-            holder.mNameView.setText(currentItem.getProductName());
+        if(currentItem.getProductType().equals("")){
+            /**
+             * means the call is coming from CouponCode
+             */
+            holder.mNameView.setText("CODE: " + currentItem.getProductName());
+            holder.mPriceView.setText("DISCOUNT: " + currentItem.getPrice() + " %");
+        }else{
+            if(!currentItem.getProductType().equals("None")){
+                /**
+                 * means the call is from TakeOrder (order list)
+                 */
+                holder.mNameView.setText(currentItem.getProductName() + " - " + currentItem.getProductType());
+            }
+            else {
+                holder.mNameView.setText(currentItem.getProductName());
+            }
+            if(currentItem.getPrice().equals("admin") || currentItem.getPrice().equals("Employee")){
+                holder.mPriceView.setText(currentItem.getPrice());
+            }else{
+                holder.mPriceView.setText("Rs. " + currentItem.getPrice());
+            }
         }
         holder.mCountView.setText(currentItem.getCount());
-        if(currentItem.getPrice().equals("admin") || currentItem.getPrice().equals("Employee")){
-            holder.mPriceView.setText(currentItem.getPrice());
-        }else{
-            holder.mPriceView.setText("Rs. " + currentItem.getPrice());
-        }
-
     }
 
     @Override

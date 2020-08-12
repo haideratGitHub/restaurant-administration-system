@@ -45,6 +45,7 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
     CardView addIngredient;
     EditText ingredientName;
     EditText ingredientQuantity;
+    Button addCouponCode;
 
     private FirebaseFirestore firebaseFirestore;
     ArrayList<MenuItem> exampleList = new ArrayList<>();
@@ -55,6 +56,7 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
+        addCouponCode = findViewById(R.id.add_coupon_code);
         addMenuItem = findViewById(R.id.add_menu_item);
         addMenuItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,7 +80,17 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
         mLayoutManager = new LinearLayoutManager(this);
 
         getDataFromFirebase();
+        addCouponCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gotoCouponCode();
+            }
+        });
 
+    }
+    public void gotoCouponCode(){
+        Intent intent = new Intent(this,CouponCode.class);
+        startActivity(intent);
     }
     public void checkfun(){
         Toast.makeText(this,"Sorry! This feature is under development",Toast.LENGTH_SHORT).show();

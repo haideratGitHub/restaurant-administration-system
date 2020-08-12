@@ -2,10 +2,16 @@ package com.example.burgerandgrill;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -75,6 +81,10 @@ public class TakeOrder extends AppCompatActivity {
     final ArrayList<IngredientModel> inventoryList = new ArrayList<>();
     final ArrayList<IngredientModel> newIngredientList = new ArrayList<>();
     ArrayList<OrderModel> orderList = new ArrayList<>();
+
+    final int SEND_SMS_PERMISSION_REQUEST_CODE = 1;
+    final String ADMIN_PHONE_NUMBER = "+923078780061";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +189,19 @@ public class TakeOrder extends AppCompatActivity {
         });
 
     }
+    private void onSend(String sms){
+        if(checkPermission(Manifest.permission.SEND_SMS)){
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(ADMIN_PHONE_NUMBER,null,sms,null,null);
+            //Toast.makeText(this,"sent",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this,"permission denied",Toast.LENGTH_SHORT).show();
+        }
+    }
+    private boolean checkPermission(String permission){
+        int check = ContextCompat.checkSelfPermission(this,permission);
+        return (check == PackageManager.PERMISSION_GRANTED);
+    }
     private void adapterClickListener(){
         mAdapter.setOnItemClickListener(new OrderListAdapter.OnItemClickListener() {
             @Override
@@ -272,13 +295,13 @@ public class TakeOrder extends AppCompatActivity {
         //String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         //As we are in TakeOrder so order type must be "Order", not "Delivery"
         Date cal = Calendar.getInstance().getTime();
-        String date = DateFormat.getDateInstance(DateFormat.FULL).format(cal.getTime());
-        String type = "Order";
+        final String date = DateFormat.getDateInstance(DateFormat.FULL).format(cal.getTime());
+        final String type = "Order";
         String discountGiven = discount.getText().toString();
         if(discountGiven.equals("")){
             discountGiven = "0";
         }
-        String finalBill;
+        final String finalBill;
         if(billAfterDiscount == 0){
             //there is no discount given and we can save total bill as final
             finalBill = String.valueOf(totalBill);
@@ -315,7 +338,7 @@ public class TakeOrder extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        success();
+                        success(date,type,finalBill);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -327,11 +350,17 @@ public class TakeOrder extends AppCompatActivity {
 
     }
 
-    private void success(){
+    private void success(String date, String type, String finalBill){
+        String orderDetailsSMS = type + " details" + "\n\n";
         int i = 0;
         while (!orderList.isEmpty()){
+            orderDetailsSMS = orderDetailsSMS + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
             orderList.remove(i); //for updating order list view
         }
+        orderDetailsSMS = orderDetailsSMS + "\n";
+        orderDetailsSMS = orderDetailsSMS + ("Date: " + date + "\n");
+        //TODO also add which discount code is used in order - do this after discount coupon system added
+        orderDetailsSMS = orderDetailsSMS + ("Bill: " + finalBill + "\n");
         if(orderList.isEmpty()){
             discount.setText("");
             discount.setHint("Discount");
@@ -339,6 +368,12 @@ public class TakeOrder extends AppCompatActivity {
             mAdapterForCuurentOrder = new CurrentOrderListAdapter(orderList);
             mRecyclerViewForCuurentOrder.setLayoutManager(mLayoutManagerForCuurentOrder);
             mRecyclerViewForCuurentOrder.setAdapter(mAdapterForCuurentOrder);
+        }
+        if(checkPermission(Manifest.permission.SEND_SMS)){
+            onSend(orderDetailsSMS);
+        }else{
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
         }
     }
 
