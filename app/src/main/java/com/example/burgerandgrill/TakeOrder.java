@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class TakeOrder extends AppCompatActivity {
+public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.IExampleDialogListener{
 
     private RecyclerView mRecyclerView;
     private OrderListAdapter mAdapter;
@@ -58,9 +58,8 @@ public class TakeOrder extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManagerForCuurentOrder;
 
     Button placeOrder;
-    EditText discount;
+    Button discount;
     TextView total;
-    Button applyDiscount;
 
     private FirebaseFirestore firebaseFirestore;
     ArrayList<MenuItem> exampleList = new ArrayList<>();
@@ -79,6 +78,7 @@ public class TakeOrder extends AppCompatActivity {
 
     int totalBill = 0;
     int billAfterDiscount = 0;
+    String appliedDiscountCode = "";
 
 
     final ArrayList<IngredientModel> inventoryList = new ArrayList<>();
@@ -108,7 +108,6 @@ public class TakeOrder extends AppCompatActivity {
         mRecyclerViewForCuurentOrder.setNestedScrollingEnabled(false);
 
         discount = findViewById(R.id.order_discount);
-        applyDiscount = findViewById(R.id.apple_discount);
         total = findViewById(R.id.order_total_bill);
         placeOrder = findViewById(R.id.place_order);
         placeOrder.setVisibility(View.GONE);
@@ -185,12 +184,11 @@ public class TakeOrder extends AppCompatActivity {
             }
         });
 
-        applyDiscount.setOnClickListener(new View.OnClickListener() {
+        discount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                computeDiscount();
-                discount.setEnabled(false);
-                discount.setFocusable(false);
+                ApplyDiscountDialog exampleDialog = new ApplyDiscountDialog();
+                exampleDialog.show(getSupportFragmentManager(), "example dialog");
             }
         });
 
@@ -199,6 +197,9 @@ public class TakeOrder extends AppCompatActivity {
         if(checkPermission(Manifest.permission.SEND_SMS)){
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(ADMIN_PHONE_NUMBER,null,sms,null,null);
+            discount.setEnabled(true);
+            discount.setTextColor(Color.BLACK);
+            discount.setText("Discount ?");
             //Toast.makeText(this,"sent",Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(this,"permission denied",Toast.LENGTH_SHORT).show();
@@ -364,8 +365,17 @@ public class TakeOrder extends AppCompatActivity {
             orderList.remove(i); //for updating order list view
         }
         orderDetailsSMS = orderDetailsSMS + "\n";
-        orderDetailsSMS = orderDetailsSMS + ("Date: " + date + "\n");
-        //TODO also add which discount code is used in order - do this after discount coupon system added
+
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        String d = format.format(Date.parse(date));
+
+        orderDetailsSMS = orderDetailsSMS + ("Dated: " + d + "\n");
+        if(appliedDiscountCode.equals("")){
+            orderDetailsSMS = orderDetailsSMS + ("Discount code: None " + "\n");
+        }else{
+            orderDetailsSMS = orderDetailsSMS + ("Discount code: " + appliedDiscountCode + "\n");
+        }
+
         orderDetailsSMS = orderDetailsSMS + ("Bill: " + finalBill + "\n");
         if(orderList.isEmpty()){
             discount.setText("");
@@ -438,21 +448,53 @@ public class TakeOrder extends AppCompatActivity {
 
     }
 
-    private void computeDiscount(){
-        if(!TextUtils.isEmpty(discount.getText())){
-            int disc = Integer.valueOf(discount.getText().toString());
-            if(disc > 0 && disc < 100){
-                int priceReduce = (int) (((1.0*disc)/100)*totalBill);
+    private void computeDiscount(int disc){
+        if(totalBill > 0){
+            int priceReduce = (int) (((1.0*disc)/100)*totalBill);
+            billAfterDiscount = totalBill - priceReduce;
+            total.setText("Rs. " + String.valueOf(billAfterDiscount));
+            discount.setEnabled(false);
+        }
+    }
 
-                billAfterDiscount = totalBill - priceReduce;
-                total.setText("Rs. " + String.valueOf(billAfterDiscount));
-            }
-            else{
-                Toast.makeText(this,"invalid discount value!!",Toast.LENGTH_SHORT);
-            }
+    @Override
+    public void applyQuantity(String discountCode) {
+        if(!discountCode.equals("")){
+            firebaseFirestore = firebaseFirestore.getInstance();
+            final CollectionReference collection = firebaseFirestore.collection("DISCOUNT");
+            collection.whereEqualTo("code",discountCode)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
+                                for(DocumentSnapshot documentSnapshot: task.getResult()){
+                                    //String docID = documentSnapshot.getId();
+                                    appliedDiscountCode = documentSnapshot.get("code").toString();
+                                    int disc = Integer.parseInt(documentSnapshot.get("discount").toString());
+                                    computeDiscount(disc);
+
+                                }
+                            }else{
+                                makeToastNoCodeFound();
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                        }
+                    })
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        }
+                    });
         }
-        else{
-            Toast.makeText(this,"Enter discount to apply!!",Toast.LENGTH_SHORT);
-        }
+
+    }
+    private void makeToastNoCodeFound(){
+        Toast.makeText(this,"Wrong discount code!! Enter again!!",Toast.LENGTH_SHORT).show();
     }
 }
