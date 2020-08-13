@@ -22,7 +22,7 @@ public class MenuListAdapter extends RecyclerView.Adapter<MenuListAdapter.Exampl
     public interface OnItemClickListener{
         void onItemClick(int position);
         void onEditMenuItemClick(int position);
-        void onDeleteMenuItemClick(int position);
+//        void onDeleteMenuItemClick(int position);
     }
 
 
@@ -44,7 +44,7 @@ public class MenuListAdapter extends RecyclerView.Adapter<MenuListAdapter.Exampl
             mTextView1 = itemView.findViewById(R.id.textView);
             mTextView2 = itemView.findViewById(R.id.textView2);
             editMenuItem = itemView.findViewById(R.id.edit_menu_item);
-            deleteMenuItem = itemView.findViewById(R.id.delete_menu_item);
+//            deleteMenuItem = itemView.findViewById(R.id.delete_menu_item);
             addToOrderList = itemView.findViewById(R.id.add_to_order);
             removeFromOrderList = itemView.findViewById(R.id.remove_from_order);
 
@@ -73,17 +73,17 @@ public class MenuListAdapter extends RecyclerView.Adapter<MenuListAdapter.Exampl
                     }
                 }
             });
-            deleteMenuItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null){
-                        int position = getAdapterPosition();
-                        if(position != RecyclerView.NO_POSITION){
-                            listener.onDeleteMenuItemClick(position);
-                        }
-                    }
-                }
-            });
+//            deleteMenuItem.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (listener != null){
+//                        int position = getAdapterPosition();
+//                        if(position != RecyclerView.NO_POSITION){
+//                            listener.onDeleteMenuItemClick(position);
+//                        }
+//                    }
+//                }
+//            });
         }
     }
 

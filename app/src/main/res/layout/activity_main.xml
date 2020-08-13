@@ -27,7 +27,7 @@
         android:layout_height="51dp"
         android:ems="10"
         android:hint="Username"
-        android:inputType="textEmailAddress"
+        android:inputType="textPersonName"
         android:textColor="@android:color/white"
         android:textColorHint="@android:color/white"
          />

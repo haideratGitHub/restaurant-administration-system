@@ -3,12 +3,16 @@ package com.example.burgerandgrill;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -55,6 +59,9 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
+        upArrow.setColorFilter(Color.parseColor("#ffcc0000"), PorterDuff.Mode.SRC_ATOP);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
 
         addCouponCode = findViewById(R.id.add_coupon_code);
         addMenuItem = findViewById(R.id.add_menu_item);
@@ -68,6 +75,7 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
         addIngredient = findViewById(R.id.add_ingredient);
         ingredientName = findViewById(R.id.ingredient_name);
         ingredientQuantity = findViewById(R.id.ingredient_quantity);
+
         addIngredient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,6 +86,8 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchHelperCallBack);
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
 
         getDataFromFirebase();
         addCouponCode.setOnClickListener(new View.OnClickListener() {
@@ -88,6 +98,35 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
         });
 
     }
+    ItemTouchHelper.SimpleCallback itemTouchHelperCallBack = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int direction) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mRecyclerView.getContext(),R.style.DialogeTheme);
+            builder.setMessage("This menu item will be permanently deleted. Are you sure ?")
+                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            deleteMenuItem(viewHolder.getAdapterPosition());
+                        }
+                    })
+                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mAdapter = new MenuListAdapter(exampleList);
+                            mRecyclerView.setLayoutManager(mLayoutManager);
+                            mRecyclerView.setAdapter(mAdapter);
+                            adapterOnClickListener();
+                        }
+                    }).show();
+
+
+        }
+    };
     public void gotoCouponCode(){
         Intent intent = new Intent(this,CouponCode.class);
         startActivity(intent);
@@ -149,33 +188,34 @@ public class Menu extends AppCompatActivity implements AddIngredientDialog.Examp
             @Override
             public void onEditMenuItemClick(int position){
                 editWhichMenuItem = position;
-                editMenuItem();
+                editMenuItem(Integer.parseInt(exampleList.get(editWhichMenuItem).getmText2()));
             }
-            @Override
-            public void onDeleteMenuItemClick(final int position){
-                AlertDialog.Builder builder = new AlertDialog.Builder(mRecyclerView.getContext());
-                builder.setMessage("This menu item will be permanently deleted. Are you sure ?")
-                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                deleteMenuItem(position);
-                            }
-                        })
-                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        }).show();
-
-            }
-
-
+//            @Override
+//            public void onDeleteMenuItemClick(final int position){
+//                AlertDialog.Builder builder = new AlertDialog.Builder(mRecyclerView.getContext());
+//                builder.setMessage("This menu item will be permanently deleted. Are you sure ?")
+//                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                deleteMenuItem(position);
+//                            }
+//                        })
+//                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//
+//                            }
+//                        }).show();
+//
+//            }
         });
     }
 
-    private void editMenuItem(){
+    private void editMenuItem(int currentPrice){
+        Bundle args = new Bundle();
+        args.putInt("currentPrice", currentPrice);
         EditMenuItemDialog exampleDialog = new EditMenuItemDialog();
+        exampleDialog.setArguments(args);
         exampleDialog.show(getSupportFragmentManager(), "example dialog");
     }
     @Override

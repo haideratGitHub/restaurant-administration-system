@@ -29,7 +29,7 @@
         android:text="UNIT"
         android:padding="5dp"
         android:textStyle="bold"
-        android:textColor="@color/colorAccent"
+        android:textColor="@android:color/black"
         >
 
     </TextView>

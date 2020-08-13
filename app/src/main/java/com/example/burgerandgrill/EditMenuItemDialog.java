@@ -19,10 +19,11 @@ public class EditMenuItemDialog extends AppCompatDialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),R.style.DialogeTheme);
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.layout_edit_menu_item_dialog, null);
+
 
         builder.setView(view)
                 .setTitle("EDIT")
@@ -47,6 +48,8 @@ public class EditMenuItemDialog extends AppCompatDialogFragment {
                 });
 
         newPrice = view.findViewById(R.id.new_price_edit_menu_item_dialog);
+        Bundle args = getArguments();
+        newPrice.setText(String.valueOf(args.getInt("currentPrice")));
 
         return builder.create();
     }

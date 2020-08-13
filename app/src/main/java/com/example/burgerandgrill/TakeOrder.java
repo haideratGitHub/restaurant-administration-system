@@ -372,11 +372,13 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
         orderDetailsSMS = orderDetailsSMS + ("Dated: " + d + "\n");
         if(appliedDiscountCode.equals("")){
             orderDetailsSMS = orderDetailsSMS + ("Discount code: None " + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Bill: " + finalBill + "\n");
         }else{
             orderDetailsSMS = orderDetailsSMS + ("Discount code: " + appliedDiscountCode + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Bill: " + billAfterDiscount + "\n");
         }
 
-        orderDetailsSMS = orderDetailsSMS + ("Bill: " + finalBill + "\n");
+
         if(orderList.isEmpty()){
             discount.setText("");
             discount.setHint("Discount");

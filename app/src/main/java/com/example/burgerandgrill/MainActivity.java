@@ -149,7 +149,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkInputsPattern(){
-        if(email.getText().toString().matches(emailPattern)){
+//        email.getText().toString().matches(emailPattern)
+        if(true){
             DocumentReference documentReference1 = firebaseFirestore.document(COLLECTION + DOCUMENT_ADMIN);
             DocumentReference documentReference2 = firebaseFirestore.document(COLLECTION + DOCUMENT_EMPLOYEE);
             CollectionReference collectionReference = firebaseFirestore.collection(COLLECTION);

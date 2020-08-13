@@ -54,16 +54,16 @@
             ></Button>
 
 
-        <Button
-            android:id="@+id/delete_menu_item"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:background="@drawable/delete"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:padding="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            ></Button>
+<!--        <Button-->
+<!--            android:id="@+id/delete_menu_item"-->
+<!--            android:layout_width="35dp"-->
+<!--            android:layout_height="35dp"-->
+<!--            android:background="@drawable/delete"-->
+<!--            android:foreground="?attr/selectableItemBackgroundBorderless"-->
+<!--            android:padding="10dp"-->
+<!--            android:layout_marginRight="10dp"-->
+<!--            android:layout_marginLeft="10dp"-->
+<!--            ></Button>-->
 
     </LinearLayout>
 
