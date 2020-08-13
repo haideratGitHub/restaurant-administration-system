@@ -2,11 +2,16 @@ package com.example.burgerandgrill;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -14,10 +19,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -54,7 +62,10 @@ public class CouponCode extends AppCompatActivity implements AddCouponCodeDialog
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
 
+
         displayCouponCodeList();
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(itemTouchHelperCallBack);
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
 
         addCouponCode = findViewById(R.id.add_coupon_code);
         addCouponCode.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +75,56 @@ public class CouponCode extends AppCompatActivity implements AddCouponCodeDialog
             }
         });
     }
+
+    ItemTouchHelper.SimpleCallback itemTouchHelperCallBack = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int direction) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mRecyclerView.getContext(),R.style.DialogeTheme);
+            builder.setMessage("Coupon code will be permanently deleted. You want to continue ?")
+                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            deleteCode(viewHolder.getAdapterPosition());
+                        }
+                    })
+                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mAdapter = new CurrentOrderListAdapter(exampleList);
+                            mRecyclerView.setLayoutManager(mLayoutManager);
+                            mRecyclerView.setAdapter(mAdapter);
+                        }
+                    }).show();
+
+
+        }
+    };
+    private void deleteCode(int position){
+        //remove from firebase
+        final CollectionReference collectionReference1 = firebaseFirestore.collection(COLLECTION);
+        collectionReference1.whereEqualTo("code",exampleList.get(position).getProductName())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            for(DocumentSnapshot documentSnapshot: task.getResult()){
+                                String docID = documentSnapshot.getId();
+                                collectionReference1.document(docID).delete();
+
+                            }
+                        }
+                    }
+                });
+        exampleList.remove(position);
+        mAdapter.notifyDataSetChanged();
+    }
+
     private void displayCouponCodeList(){
         firebaseFirestore = firebaseFirestore.getInstance();
         CollectionReference collectionReference = firebaseFirestore.collection(COLLECTION);
@@ -118,4 +179,5 @@ public class CouponCode extends AppCompatActivity implements AddCouponCodeDialog
             mRecyclerView.setAdapter(mAdapter);
         }
     }
+
 }
