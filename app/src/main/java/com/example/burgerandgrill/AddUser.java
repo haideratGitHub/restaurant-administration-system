@@ -193,7 +193,7 @@ public class AddUser extends AppCompatActivity {
         if(!TextUtils.isEmpty(username.getText())){
             if(!TextUtils.isEmpty(password.getText())){
                 save.setEnabled(true);
-                save.setTextColor(Color.BLACK);
+                save.setTextColor(Color.parseColor("#ffcc0000"));
             }
             else{
                 save.setEnabled(false);
