@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         if(!TextUtils.isEmpty(email.getText())){
             if(!TextUtils.isEmpty(password.getText())){
                 login.setEnabled(true);
-                login.setTextColor(Color.BLACK);
+                login.setTextColor(Color.parseColor("#ffcc0000"));
             }
             else{
                 login.setEnabled(false);

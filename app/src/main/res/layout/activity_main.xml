@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="51dp"
         android:ems="10"
-        android:hint="Email"
+        android:hint="Username"
         android:inputType="textEmailAddress"
         android:textColor="@android:color/white"
         android:textColorHint="@android:color/white"
@@ -58,11 +58,12 @@
         android:layout_marginTop="25dp"
         android:layout_marginBottom="45dp"
         android:background="@drawable/round_corners"
-        android:backgroundTint="@color/colorAccent"
+        android:backgroundTint="#FFDF00"
         android:enabled="false"
-        android:fontFamily="@font/notosansbold"
+        android:fontFamily="@font/cooperblackbt"
         android:foreground="?attr/selectableItemBackgroundBorderless"
         android:text="Log in"
+        android:textStyle="bold"
         android:textColor="@android:color/darker_gray"
         />
 
