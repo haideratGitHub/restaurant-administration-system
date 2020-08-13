@@ -74,7 +74,6 @@
                 android:id="@+id/inventory"
                 android:layout_width="@dimen/_100sdp"
                 android:layout_height="match_parent"
-
                 app:cardCornerRadius="12dp"
                 app:cardElevation="5dp"
                 app:cardBackgroundColor="@android:color/white"

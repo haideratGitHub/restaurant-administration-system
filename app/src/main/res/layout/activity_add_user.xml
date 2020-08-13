@@ -142,7 +142,8 @@
         android:textColor="@android:color/darker_gray"
         android:background="@drawable/round_corners"
         android:backgroundTint="@color/colorAccent"
-        android:textSize="20dp"></Button>
+        android:textSize="20dp"
+        android:padding="@dimen/_10sdp"></Button>
 
     <ProgressBar
         android:id="@+id/add_user_progressBar"
