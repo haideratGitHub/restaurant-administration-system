@@ -8,20 +8,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.telephony.SmsManager;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +30,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.WriteBatch;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -44,8 +38,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.IExampleDialogListener{
 
@@ -86,7 +78,7 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
     ArrayList<OrderModel> orderList = new ArrayList<>();
 
     final int SEND_SMS_PERMISSION_REQUEST_CODE = 1;
-    final String ADMIN_PHONE_NUMBER = "+923078780061";
+    final String ADMIN_PHONE_NUMBER = "03078780061";
 
 
     @Override
@@ -192,6 +184,46 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
             }
         });
 
+    }
+    private void sendOrderDetailsToAdmin(String date, String type, String finalBill){
+        String orderDetailsSMS = type + " details" + "\n\n";
+        int i = 0;
+        while (!orderList.isEmpty()){
+            orderDetailsSMS = orderDetailsSMS + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
+            orderList.remove(i); //for updating order list view
+        }
+        orderDetailsSMS = orderDetailsSMS + "\n";
+
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        String d = format.format(Date.parse(date));
+
+        orderDetailsSMS = orderDetailsSMS + ("Dated: " + d + "\n");
+        if(appliedDiscountCode.equals("")){
+            orderDetailsSMS = orderDetailsSMS + ("Discount code: None " + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Bill: " + finalBill + "\n");
+        }else{
+            orderDetailsSMS = orderDetailsSMS + ("Discount code: " + appliedDiscountCode + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Bill: " + billAfterDiscount + "\n");
+        }
+
+        if(checkPermission(Manifest.permission.SEND_SMS)){
+            onSend(orderDetailsSMS);
+        }else{
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
+        }
+    }
+    private void notifyAdmin(){
+        /**
+         * Notify admin for shortage of stock in inventory
+         */
+        String message = "ALERT!!! Shortage of stock in inventory!!";
+        if(checkPermission(Manifest.permission.SEND_SMS)){
+            onSend(message);
+        }else{
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
+        }
     }
     private void onSend(String sms){
         if(checkPermission(Manifest.permission.SEND_SMS)){
@@ -316,10 +348,13 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
             //there is discount given so now we will save total bill after discount in final bill
             finalBill = String.valueOf(billAfterDiscount);
         }
+
+        sendOrderDetailsToAdmin(date,type,finalBill);
         if(validateOrder()){
             Toast.makeText(this,"Order Placed",Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(this,"Order Placed!! Shortage in inventory!!",Toast.LENGTH_SHORT).show();
+            notifyAdmin();
         }
 
         String[] productName = new String[orderList.size()];
@@ -339,13 +374,15 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
         List<String> c = Arrays.asList(count);
         List<String> pr = Arrays.asList(price);
 
+        //TODO discountGiven is "Discount ? "... change it to the discount code or percentage
+
         OrderSaveModel orderSaveModel = new OrderSaveModel(date,type,discountGiven,finalBill,pn,pt,c,pr);
         firebaseFirestore = firebaseFirestore.getInstance();
         firebaseFirestore.collection("SALES").add(orderSaveModel)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        success(date,type,finalBill);
+                        success();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -356,45 +393,16 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
                 });
 
     }
-
-    private void success(String date, String type, String finalBill){
-        String orderDetailsSMS = type + " details" + "\n\n";
-        int i = 0;
-        while (!orderList.isEmpty()){
-            orderDetailsSMS = orderDetailsSMS + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
-            orderList.remove(i); //for updating order list view
-        }
-        orderDetailsSMS = orderDetailsSMS + "\n";
-
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-        String d = format.format(Date.parse(date));
-
-        orderDetailsSMS = orderDetailsSMS + ("Dated: " + d + "\n");
-        if(appliedDiscountCode.equals("")){
-            orderDetailsSMS = orderDetailsSMS + ("Discount code: None " + "\n");
-            orderDetailsSMS = orderDetailsSMS + ("Bill: " + finalBill + "\n");
-        }else{
-            orderDetailsSMS = orderDetailsSMS + ("Discount code: " + appliedDiscountCode + "\n");
-            orderDetailsSMS = orderDetailsSMS + ("Bill: " + billAfterDiscount + "\n");
-        }
-
-
+    private void success(){
         if(orderList.isEmpty()){
             discount.setText("");
-            discount.setHint("Discount");
+            discount.setText("Discount ?");
             total.setText("Rs. 0");
             mAdapterForCuurentOrder = new CurrentOrderListAdapter(orderList);
             mRecyclerViewForCuurentOrder.setLayoutManager(mLayoutManagerForCuurentOrder);
             mRecyclerViewForCuurentOrder.setAdapter(mAdapterForCuurentOrder);
         }
-        if(checkPermission(Manifest.permission.SEND_SMS)){
-            onSend(orderDetailsSMS);
-        }else{
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
-        }
     }
-
     private boolean validateOrder(){
         /**
          * Check if there is enough ingredients in inventory to place the order
@@ -408,7 +416,7 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
             for(int j=0; j<orderList.size();j++){
                 int index = orderList.get(j).getIname().indexOf(inventoryList.get(i).name);
                 int count = Integer.parseInt(orderList.get(j).getCount());
-                if(index > 0){
+                if(index >= 0){
                     sum = sum + (count*Integer.parseInt(orderList.get(j).getIquantity().get(index)));
                 }
             }
@@ -449,7 +457,6 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
         return validate[0];
 
     }
-
     private void computeDiscount(int disc){
         if(totalBill > 0){
             int priceReduce = (int) (((1.0*disc)/100)*totalBill);

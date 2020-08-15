@@ -98,6 +98,8 @@ public class Inventory extends AppCompatActivity implements AddQuantityInventory
             }
         });
     }
+
+
     private void openDialog(int position){
         //Toast.makeText(this,"Open dialog to update quantity",Toast.LENGTH_SHORT).show();
         AddQuantityInventoryDialog exampleDialog = new AddQuantityInventoryDialog();
@@ -105,11 +107,18 @@ public class Inventory extends AppCompatActivity implements AddQuantityInventory
     }
 
     @Override
-    public void applyQuantity(String updatedQuantity) {
+    public void applyQuantity(String updatedQuantity, boolean isAdd) {
         //Updating quantity in firestore
         firebaseFirestore = firebaseFirestore.getInstance();
-        int prevQuantity = Integer.parseInt(tempQuantity);
-        int addQuantity = prevQuantity + Integer.parseInt(updatedQuantity);
+        int addQuantity = 0;
+        if(isAdd){
+            int prevQuantity = Integer.parseInt(tempQuantity);
+            addQuantity = prevQuantity + Integer.parseInt(updatedQuantity);
+            inventoryList.get(ingredientNumberInList).setQuantity(String.valueOf(addQuantity));
+        }else{
+            int prevQuantity = Integer.parseInt(inventoryList.get(ingredientNumberInList).getQuantity());
+            addQuantity = prevQuantity - Integer.parseInt(updatedQuantity);
+        }
         tempQuantity = String.valueOf(addQuantity);
         //IngredientModel ingredientModel = new IngredientModel(tempName,tempQuantity,tempUnit);
         final CollectionReference collectionReference1 = firebaseFirestore.collection("INGREDIENT");

@@ -2,10 +2,18 @@ package com.example.burgerandgrill;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -34,7 +42,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class HomeDelivery extends AppCompatActivity {
+public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDialog.IExampleDialogListener{
 
     private RecyclerView mRecyclerView;
     private OrderListAdapter mAdapter;
@@ -48,25 +56,31 @@ public class HomeDelivery extends AppCompatActivity {
     EditText cusName;
     EditText cusPhNumber;
     EditText cusAddress;
-    EditText discount;
+    Button discount;
     TextView total;
-    Button applyDiscount;
 
     private FirebaseFirestore firebaseFirestore;
     ArrayList<MenuItem> exampleList = new ArrayList<>();
 
     int totalBill = 0;
     int billAfterDiscount = 0;
+    String appliedDiscountCode = "";
 
 
     final ArrayList<IngredientModel> inventoryList = new ArrayList<>();
     ArrayList<OrderModel> orderList = new ArrayList<>();
+
+    final int SEND_SMS_PERMISSION_REQUEST_CODE = 1;
+    final String ADMIN_PHONE_NUMBER = "03078780061";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_delivery);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_material);
+        upArrow.setColorFilter(Color.parseColor("#ffcc0000"), PorterDuff.Mode.SRC_ATOP);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
 
         mRecyclerView = findViewById(R.id.menu_for_order_delivery);
         mRecyclerView.setHasFixedSize(true);
@@ -81,7 +95,6 @@ public class HomeDelivery extends AppCompatActivity {
         cusPhNumber = findViewById(R.id.customer_number);
         cusAddress = findViewById(R.id.customer_address);
         discount = findViewById(R.id.order_discount_delivery);
-        applyDiscount = findViewById(R.id.apple_discount_delivery);
         total = findViewById(R.id.order_total_bill_delivery);
         placeOrder = findViewById(R.id.place_order_delivery);
 
@@ -159,18 +172,73 @@ public class HomeDelivery extends AppCompatActivity {
             }
         });
 
-        applyDiscount.setOnClickListener(new View.OnClickListener() {
+        discount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                computeDiscount();
-                discount.setEnabled(false);
-                discount.setFocusable(false);
+                ApplyDiscountDialog exampleDialog = new ApplyDiscountDialog();
+                exampleDialog.show(getSupportFragmentManager(), "example dialog");
             }
         });
 
     }
     private void showToast(){
         Toast.makeText(this,"incomplete info!!", Toast.LENGTH_SHORT).show();
+    }
+    private void sendOrderDetailsToAdmin(String date, String type, String finalBill){
+        String orderDetailsSMS = type + " details" + "\n\n";
+        int i = 0;
+        while (!orderList.isEmpty()){
+            orderDetailsSMS = orderDetailsSMS + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
+            orderList.remove(i); //for updating order list view
+        }
+        orderDetailsSMS = orderDetailsSMS + "\n";
+
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        String d = format.format(Date.parse(date));
+
+        orderDetailsSMS = orderDetailsSMS + ("Dated: " + d + "\n");
+        if(appliedDiscountCode.equals("")){
+            orderDetailsSMS = orderDetailsSMS + ("Discount code: None " + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Bill: " + finalBill + "\n");
+        }else{
+            orderDetailsSMS = orderDetailsSMS + ("Discount code: " + appliedDiscountCode + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Bill: " + billAfterDiscount + "\n");
+        }
+
+        if(checkPermission(Manifest.permission.SEND_SMS)){
+            onSend(orderDetailsSMS);
+        }else{
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
+        }
+    }
+    private void onSend(String sms){
+        if(checkPermission(Manifest.permission.SEND_SMS)){
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(ADMIN_PHONE_NUMBER,null,sms,null,null);
+            discount.setEnabled(true);
+            discount.setTextColor(Color.BLACK);
+            discount.setText("Discount ?");
+            //Toast.makeText(this,"sent",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this,"permission denied",Toast.LENGTH_SHORT).show();
+        }
+    }
+    private boolean checkPermission(String permission){
+        int check = ContextCompat.checkSelfPermission(this,permission);
+        return (check == PackageManager.PERMISSION_GRANTED);
+    }
+    private void notifyAdmin(){
+        /**
+         * Notify admin for shortage of stock in inventory
+         */
+        String message = "ALERT!!! Shortage of stock in inventory!!";
+        if(checkPermission(Manifest.permission.SEND_SMS)){
+            onSend(message);
+        }else{
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
+        }
     }
 
     private void adapterClickListener(){
@@ -282,10 +350,13 @@ public class HomeDelivery extends AppCompatActivity {
             //there is discount given so now we will save total bill after discount in final bill
             finalBill = String.valueOf(billAfterDiscount);
         }
+
+        sendOrderDetailsToAdmin(date,type,finalBill);
         if(validateOrder()){
             Toast.makeText(this,"Order Placed",Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(this,"Order Placed!! Shortage in inventory!!",Toast.LENGTH_SHORT).show();
+            notifyAdmin();
         }
         String[] productName = new String[orderList.size()];
         String[] productType = new String[orderList.size()];
@@ -331,7 +402,7 @@ public class HomeDelivery extends AppCompatActivity {
             cusName.setText("");
             cusAddress.setText("");
             cusPhNumber.setText("");
-            discount.setHint("Discount");
+            discount.setText("Discount ?");
             total.setText("Rs. 0");
             mAdapterForCuurentOrder = new CurrentOrderListAdapter(orderList);
             mRecyclerViewForCuurentOrder.setLayoutManager(mLayoutManagerForCuurentOrder);
@@ -403,21 +474,52 @@ public class HomeDelivery extends AppCompatActivity {
             return false;
         }
     }
-    private void computeDiscount(){
-        if(!TextUtils.isEmpty(discount.getText())){
-            int disc = Integer.valueOf(discount.getText().toString());
-            if(disc > 0 && disc < 100){
-                int priceReduce = (int) (((1.0*disc)/100)*totalBill);
+    private void computeDiscount(int disc){
+        if(totalBill > 0){
+            int priceReduce = (int) (((1.0*disc)/100)*totalBill);
+            billAfterDiscount = totalBill - priceReduce;
+            total.setText("Rs. " + String.valueOf(billAfterDiscount));
+            discount.setEnabled(false);
+        }
+    }
+    @Override
+    public void applyQuantity(String discountCode) {
+        if(!discountCode.equals("")){
+            firebaseFirestore = firebaseFirestore.getInstance();
+            final CollectionReference collection = firebaseFirestore.collection("DISCOUNT");
+            collection.whereEqualTo("code",discountCode)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
+                                for(DocumentSnapshot documentSnapshot: task.getResult()){
+                                    //String docID = documentSnapshot.getId();
+                                    appliedDiscountCode = documentSnapshot.get("code").toString();
+                                    int disc = Integer.parseInt(documentSnapshot.get("discount").toString());
+                                    computeDiscount(disc);
 
-                billAfterDiscount = totalBill - priceReduce;
-                total.setText("Rs. " + String.valueOf(billAfterDiscount));
-            }
-            else{
-                Toast.makeText(this,"invalid discount value!!",Toast.LENGTH_SHORT);
-            }
+                                }
+                            }else{
+                                makeToastNoCodeFound();
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                        }
+                    })
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        }
+                    });
         }
-        else{
-            Toast.makeText(this,"Enter discount to apply!!",Toast.LENGTH_SHORT);
-        }
+
+    }
+    private void makeToastNoCodeFound(){
+        Toast.makeText(this,"Wrong discount code!! Enter again!!",Toast.LENGTH_SHORT).show();
     }
 }

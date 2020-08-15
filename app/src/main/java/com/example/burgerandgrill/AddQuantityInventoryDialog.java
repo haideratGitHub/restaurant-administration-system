@@ -21,17 +21,22 @@ public class AddQuantityInventoryDialog extends AppCompatDialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogeTheme);
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.layout_add_quantity_inventory_dialog, null);
 
         builder.setView(view)
-                .setTitle("ADD MORE STOCK")
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                .setTitle("ADD STOCK")
+                .setNegativeButton("SUBTRACT", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                        if(checkInputs()){
+                            String updatedQuantity = addQuantity.getText().toString();
+                            listener.applyQuantity(updatedQuantity,false);
+                        }
+                        else{
+                        }
                     }
                 })
                 .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
@@ -39,7 +44,7 @@ public class AddQuantityInventoryDialog extends AppCompatDialogFragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if(checkInputs()){
                             String updatedQuantity = addQuantity.getText().toString();
-                            listener.applyQuantity(updatedQuantity);
+                            listener.applyQuantity(updatedQuantity,true);
                         }
                         else{
                         }
@@ -64,7 +69,7 @@ public class AddQuantityInventoryDialog extends AppCompatDialogFragment {
     }
 
     public interface IExampleDialogListener {
-        void applyQuantity(String updatedQuantity);
+        void applyQuantity(String updatedQuantity, boolean isAdd);
     }
 
 
