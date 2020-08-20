@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -17,6 +18,7 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +39,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.IExampleDialogListener{
 
@@ -49,6 +53,7 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
     private CurrentOrderListAdapter mAdapterForCuurentOrder;
     private RecyclerView.LayoutManager mLayoutManagerForCuurentOrder;
 
+    EditText customerNumberOrder;
     Button placeOrder;
     Button discount;
     TextView total;
@@ -57,29 +62,17 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
     ArrayList<MenuItem> exampleList = new ArrayList<>();
 
 
-    /**
-     * Store all these attributes directly into firebase , dont need to store in class object
-     */
-//    String total;
-//    String type;
-//    String timeOfOrder;
-//    String customerName;
-//    String customerPhoneNo;
-//    String customerAddres;
-
-
     int totalBill = 0;
     int billAfterDiscount = 0;
     String appliedDiscountCode = "";
-
+    boolean lowInventoryIngredient = false;
 
     final ArrayList<IngredientModel> inventoryList = new ArrayList<>();
     final ArrayList<IngredientModel> newIngredientList = new ArrayList<>();
     ArrayList<OrderModel> orderList = new ArrayList<>();
 
     final int SEND_SMS_PERMISSION_REQUEST_CODE = 1;
-    final String ADMIN_PHONE_NUMBER = "03078780061";
-
+    final String ADMIN_PHONE_NUMBER = "03218488872";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,11 +92,11 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
         mLayoutManagerForCuurentOrder = new LinearLayoutManager(this);
         mRecyclerViewForCuurentOrder.setNestedScrollingEnabled(false);
 
+        customerNumberOrder = findViewById(R.id.customer_number_order);
         discount = findViewById(R.id.order_discount);
         total = findViewById(R.id.order_total_bill);
         placeOrder = findViewById(R.id.place_order);
         placeOrder.setVisibility(View.GONE);
-
 
 
         firebaseFirestore = firebaseFirestore.getInstance();
@@ -186,28 +179,44 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
 
     }
     private void sendOrderDetailsToAdmin(String date, String type, String finalBill){
-        String orderDetailsSMS = type + " details" + "\n\n";
-        int i = 0;
-        while (!orderList.isEmpty()){
-            orderDetailsSMS = orderDetailsSMS + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
-            orderList.remove(i); //for updating order list view
-        }
-        orderDetailsSMS = orderDetailsSMS + "\n";
+        //String orderDetailsSMS = type + " details" + "\n\n";
+        String orderDetailsSMS = "Sale\n";
 
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         String d = format.format(Date.parse(date));
-
         orderDetailsSMS = orderDetailsSMS + ("Dated: " + d + "\n");
+        /**
+         * this is the message send to customer when their order is placed
+         */
+        String smsToCustomer = "YOUR ORDER HAS BEEN PLACED!\n";
+        //smsToCustomer = smsToCustomer + "Order Summary\n";
+        int i = 0;
+        while (i < orderList.size()){
+            orderDetailsSMS = orderDetailsSMS + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
+            //smsToCustomer = smsToCustomer + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
+            i++;
+            //orderList.remove(i); //for updating order list view
+        }
+        orderDetailsSMS = orderDetailsSMS + "\n";
+        smsToCustomer = smsToCustomer + "\n";
+
+
+        smsToCustomer = smsToCustomer + ("Dated: " + d + "\n");
         if(appliedDiscountCode.equals("")){
-            orderDetailsSMS = orderDetailsSMS + ("Discount code: None " + "\n");
-            orderDetailsSMS = orderDetailsSMS + ("Bill: " + finalBill + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Disct: Nill " + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Bill: Rs. " + finalBill + "\n");
+            smsToCustomer = smsToCustomer + ("Total Bill: Rs. " + finalBill + "\n");
         }else{
             orderDetailsSMS = orderDetailsSMS + ("Discount code: " + appliedDiscountCode + "\n");
-            orderDetailsSMS = orderDetailsSMS + ("Bill: " + billAfterDiscount + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Bill: Rs. " + billAfterDiscount + "\n");
+            smsToCustomer = smsToCustomer + ("Total Bill: Rs. " + billAfterDiscount+ "\n");
         }
 
+        smsToCustomer = smsToCustomer + "Have a nice day\nEnjoy your meal...\n\n";
+        smsToCustomer = smsToCustomer + ("Regards,\nBurger & Grill");
         if(checkPermission(Manifest.permission.SEND_SMS)){
             onSend(orderDetailsSMS);
+            sendOrderDetailsToCustomer(smsToCustomer);
         }else{
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
@@ -219,7 +228,8 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
          */
         String message = "ALERT!!! Shortage of stock in inventory!!";
         if(checkPermission(Manifest.permission.SEND_SMS)){
-            onSend(message);
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(ADMIN_PHONE_NUMBER,null,message,null,null);
         }else{
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
@@ -236,6 +246,30 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
         }else{
             Toast.makeText(this,"permission denied",Toast.LENGTH_SHORT).show();
         }
+    }
+    private void sendOrderDetailsToCustomer(String sms){
+        String cusNumber = customerNumberOrder.getText().toString();
+        if(!cusNumber.isEmpty()){
+            if(checkPermission(Manifest.permission.SEND_SMS)){
+                SmsManager smsManager = SmsManager.getDefault();
+                smsManager.sendTextMessage(cusNumber,null,sms,null,null);
+            }else{
+                Toast.makeText(this,"permission denied",Toast.LENGTH_SHORT).show();
+            }
+
+
+            /**
+             * Allowing duplicate for time being
+             * whenever you need to get list of numbers
+             * TODO make sure to remove duplicates
+             */
+            firebaseFirestore = firebaseFirestore.getInstance();
+            final Map<String,Object> number = new HashMap<>();
+            number.put("number",cusNumber);
+            firebaseFirestore.collection("NUMBERS").add(number);
+            success();
+        }
+
     }
     private boolean checkPermission(String permission){
         int check = ContextCompat.checkSelfPermission(this,permission);
@@ -336,12 +370,12 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
         Date cal = Calendar.getInstance().getTime();
         final String date = DateFormat.getDateInstance(DateFormat.FULL).format(cal.getTime());
         final String type = "Order";
-        String discountGiven = discount.getText().toString();
-        if(discountGiven.equals("")){
-            discountGiven = "0";
-        }
+//        String discountGiven = discount.getText().toString();
+//        if(discountGiven.equals("")){
+//            discountGiven = "0";
+//        }
         final String finalBill;
-        if(billAfterDiscount == 0){
+        if(appliedDiscountCode.equals("")){
             //there is no discount given and we can save total bill as final
             finalBill = String.valueOf(totalBill);
         }else{
@@ -374,9 +408,7 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
         List<String> c = Arrays.asList(count);
         List<String> pr = Arrays.asList(price);
 
-        //TODO discountGiven is "Discount ? "... change it to the discount code or percentage
-
-        OrderSaveModel orderSaveModel = new OrderSaveModel(date,type,discountGiven,finalBill,pn,pt,c,pr);
+        OrderSaveModel orderSaveModel = new OrderSaveModel(date,type,appliedDiscountCode,finalBill,pn,pt,c,pr);
         firebaseFirestore = firebaseFirestore.getInstance();
         firebaseFirestore.collection("SALES").add(orderSaveModel)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -394,14 +426,71 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
 
     }
     private void success(){
+        if(!orderList.isEmpty()){
+            saveOnGoingOrder();
+        }
+
+        String list = "";
+        int i = 0;
+        while (!orderList.isEmpty()){
+            list = list + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
+            orderList.remove(i);
+        }
+        String bill = "";
+        if (billAfterDiscount == 0){
+            bill = String.valueOf(totalBill);
+        }else{
+            bill = String.valueOf(billAfterDiscount);
+        }
         if(orderList.isEmpty()){
             discount.setText("");
+            customerNumberOrder.setText("");
             discount.setText("Discount ?");
             total.setText("Rs. 0");
             mAdapterForCuurentOrder = new CurrentOrderListAdapter(orderList);
             mRecyclerViewForCuurentOrder.setLayoutManager(mLayoutManagerForCuurentOrder);
             mRecyclerViewForCuurentOrder.setAdapter(mAdapterForCuurentOrder);
         }
+    }
+    private void saveOnGoingOrder(){
+        /**
+         * Not recommended
+         * This is jst an over head for extra writes, reads and deletes on firebase
+         * Using intent put extra as an alternative
+         */
+        Map<String,String> onGoingOrdersList = new HashMap<>();
+        String temp = "";
+        int i = 0;
+        while (!orderList.isEmpty()){
+            temp = temp + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
+            orderList.remove(i);
+        }
+        onGoingOrdersList.put("list",temp);
+        if(billAfterDiscount == 0){
+            onGoingOrdersList.put("bill",String.valueOf(totalBill));
+        }else{
+            onGoingOrdersList.put("bill",String.valueOf(billAfterDiscount));
+        }
+        if(customerNumberOrder.getText().toString().equals("")){
+            onGoingOrdersList.put("number", "0");
+        }else{
+            onGoingOrdersList.put("number", customerNumberOrder.getText().toString());
+        }
+
+        firebaseFirestore = firebaseFirestore.getInstance();
+        firebaseFirestore.collection("ON_GOING_ORDER").add(onGoingOrdersList)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("error",e.toString());
+                    }
+                });
+
     }
     private boolean validateOrder(){
         /**
@@ -440,11 +529,12 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
                                         availableQuantity = availableQuantity - Integer.parseInt(totalQuantity.get(finalI));
                                         collectionReference1.document(docID).update("quantity",availableQuantity);
                                     }else{
-                                        /*
-                                        if there is no sufficient ingredient quantity available in inventory
-                                        then just place 0 and keep placing orders
+                                        /**
+                                         * if there is no sufficient ingredient quantity available in inventory
+                                         * then just place 0 and keep placing orders
                                          */
                                         validate[0] = false;
+                                        notifyAdmin();
                                         availableQuantity = 0;
                                         collectionReference1.document(docID).update("quantity",availableQuantity);
                                     }
@@ -465,7 +555,6 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
             discount.setEnabled(false);
         }
     }
-
     @Override
     public void applyQuantity(String discountCode) {
         if(!discountCode.equals("")){
@@ -481,6 +570,7 @@ public class TakeOrder extends AppCompatActivity implements ApplyDiscountDialog.
                                     //String docID = documentSnapshot.getId();
                                     appliedDiscountCode = documentSnapshot.get("code").toString();
                                     int disc = Integer.parseInt(documentSnapshot.get("discount").toString());
+                                    appliedDiscountCode = appliedDiscountCode+"-"+String.valueOf(disc)+"%";
                                     computeDiscount(disc);
 
                                 }

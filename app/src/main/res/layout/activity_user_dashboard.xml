@@ -104,5 +104,41 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </GridLayout>
+        <TextView
+            android:id="@+id/on_going_orders"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="ON-GOING ORDERS"
+            android:textColor="#FFDF00"
+            android:textSize="20dp"
+            android:fontFamily="@font/cooperblackbt"
+            android:layout_margin="20dp"></TextView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/on_going_orders_list"
+            android:padding="10dp"
+            android:background="#333333"
+            android:scrollbars="vertical">
+        </androidx.recyclerview.widget.RecyclerView>
+        <TextView
+            android:id="@+id/on_going_deliveries"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="ON-GOING DELIVERIES"
+            android:textColor="#FFDF00"
+            android:textSize="20dp"
+            android:fontFamily="@font/cooperblackbt"
+            android:layout_margin="20dp"></TextView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/on_going_deliveries_list"
+            android:padding="10dp"
+            android:background="#333333"
+            android:scrollbars="vertical">
+        </androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>
 </ScrollView>

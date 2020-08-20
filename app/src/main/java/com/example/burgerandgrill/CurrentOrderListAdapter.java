@@ -54,20 +54,34 @@ public class CurrentOrderListAdapter extends RecyclerView.Adapter<CurrentOrderLi
             holder.mNameView.setText("CODE: " + currentItem.getProductName());
             holder.mPriceView.setText("DISCOUNT: " + currentItem.getPrice() + " %");
         }else{
-            if(!currentItem.getProductType().equals("None")){
+            if(currentItem.getProductType().equals("on_going_order")){
                 /**
-                 * means the call is from TakeOrder (order list)
+                 * means the call is from user dashboard to display
+                 * on-going order list
                  */
-                holder.mNameView.setText(currentItem.getProductName() + " - " + currentItem.getProductType());
-            }
-            else {
                 holder.mNameView.setText(currentItem.getProductName());
+                holder.mPriceView.setText("Rs: " + currentItem.getPrice());
             }
-            if(currentItem.getPrice().equals("admin") || currentItem.getPrice().equals("Employee")){
+            else if (currentItem.getProductType().equals("on_going_delivery")){
+                holder.mNameView.setText(currentItem.getProductName());
                 holder.mPriceView.setText(currentItem.getPrice());
             }else{
-                holder.mPriceView.setText("Rs. " + currentItem.getPrice());
+                if(!currentItem.getProductType().equals("None")){
+                    /**
+                     * means the call is from TakeOrder (order list)
+                     */
+                    holder.mNameView.setText(currentItem.getProductName() + " - " + currentItem.getProductType());
+                }
+                else {
+                    holder.mNameView.setText(currentItem.getProductName());
+                }
+                if(currentItem.getPrice().equals("admin") || currentItem.getPrice().equals("Employee")){
+                    holder.mPriceView.setText(currentItem.getPrice());
+                }else{
+                    holder.mPriceView.setText("Rs. " + currentItem.getPrice());
+                }
             }
+
         }
         holder.mCountView.setText(currentItem.getCount());
     }

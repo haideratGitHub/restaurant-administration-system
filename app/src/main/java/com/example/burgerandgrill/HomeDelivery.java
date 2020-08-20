@@ -39,8 +39,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDialog.IExampleDialogListener{
 
@@ -58,6 +60,8 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
     EditText cusAddress;
     Button discount;
     TextView total;
+    EditText deliveryBoyName;
+    EditText deliveryBoyNumber;
 
     private FirebaseFirestore firebaseFirestore;
     ArrayList<MenuItem> exampleList = new ArrayList<>();
@@ -65,13 +69,13 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
     int totalBill = 0;
     int billAfterDiscount = 0;
     String appliedDiscountCode = "";
-
+    boolean lowInventoryIngredient = false;
 
     final ArrayList<IngredientModel> inventoryList = new ArrayList<>();
     ArrayList<OrderModel> orderList = new ArrayList<>();
 
     final int SEND_SMS_PERMISSION_REQUEST_CODE = 1;
-    final String ADMIN_PHONE_NUMBER = "03078780061";
+    final String ADMIN_PHONE_NUMBER = "03218488872";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +101,8 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
         discount = findViewById(R.id.order_discount_delivery);
         total = findViewById(R.id.order_total_bill_delivery);
         placeOrder = findViewById(R.id.place_order_delivery);
+        deliveryBoyName = findViewById(R.id.delivery_boy_name);
+        deliveryBoyNumber = findViewById(R.id.delivery_boy_number);
 
         firebaseFirestore = firebaseFirestore.getInstance();
         CollectionReference Icollection = firebaseFirestore.collection("INGREDIENT");
@@ -185,32 +191,72 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
         Toast.makeText(this,"incomplete info!!", Toast.LENGTH_SHORT).show();
     }
     private void sendOrderDetailsToAdmin(String date, String type, String finalBill){
-        String orderDetailsSMS = type + " details" + "\n\n";
-        int i = 0;
-        while (!orderList.isEmpty()){
-            orderDetailsSMS = orderDetailsSMS + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
-            orderList.remove(i); //for updating order list view
-        }
-        orderDetailsSMS = orderDetailsSMS + "\n";
+        String orderDetailsSMS = "Sale\n";
 
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         String d = format.format(Date.parse(date));
-
         orderDetailsSMS = orderDetailsSMS + ("Dated: " + d + "\n");
+
+        String smsToCustomer1 = "Our Delivery boy will be at your door step within 20 minutes\n";
+        smsToCustomer1 = smsToCustomer1 + "In case of any delay, contact on given number:\n";
+        smsToCustomer1 = smsToCustomer1 + deliveryBoyName.getText().toString()+"\n";
+        smsToCustomer1 = smsToCustomer1 + deliveryBoyNumber.getText().toString()+"\n\n";
+        smsToCustomer1 = smsToCustomer1 + "Regards,\nBurger & Grill";
+
+        String smsToCustomer2 = "YOUR ORDER HAS BEEN PLACED!\nOrder Summary\n";
+        int i = 0;
+        while (i < orderList.size()){
+            orderDetailsSMS = orderDetailsSMS + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
+            smsToCustomer2 = smsToCustomer2 + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
+            i++;
+            //orderList.remove(i); //for updating order list view
+        }
+        orderDetailsSMS = orderDetailsSMS + "\n";
+        smsToCustomer2 = smsToCustomer2 + ("Dated: " + d + "\n");
+
         if(appliedDiscountCode.equals("")){
-            orderDetailsSMS = orderDetailsSMS + ("Discount code: None " + "\n");
-            orderDetailsSMS = orderDetailsSMS + ("Bill: " + finalBill + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Disct: Nill " + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Bill: Rs. " + finalBill + "\n");
+            smsToCustomer2 = smsToCustomer2 + ("Bill: Rs. " + finalBill + "\n");
         }else{
             orderDetailsSMS = orderDetailsSMS + ("Discount code: " + appliedDiscountCode + "\n");
-            orderDetailsSMS = orderDetailsSMS + ("Bill: " + billAfterDiscount + "\n");
+            orderDetailsSMS = orderDetailsSMS + ("Bill: Rs. " + billAfterDiscount + "\n");
+            smsToCustomer2 = smsToCustomer2 + ("Bill: Rs. " + billAfterDiscount + "\n");
         }
 
         if(checkPermission(Manifest.permission.SEND_SMS)){
             onSend(orderDetailsSMS);
+            sendOrderDetailsToCustomer(smsToCustomer1,smsToCustomer2);
         }else{
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
         }
+    }
+    private void sendOrderDetailsToCustomer(String sms1, String sms2){
+        String cusNumber = cusPhNumber.getText().toString();
+        if(!cusNumber.isEmpty()){
+            if(checkPermission(Manifest.permission.SEND_SMS)){
+                SmsManager smsManager1 = SmsManager.getDefault();
+                smsManager1.sendTextMessage(cusNumber,null,sms1,null,null);
+                SmsManager smsManager2 = SmsManager.getDefault();
+                smsManager2.sendTextMessage(cusNumber,null,sms2,null,null);
+            }else{
+                Toast.makeText(this,"permission denied",Toast.LENGTH_SHORT).show();
+            }
+
+
+            /**
+             * Allowing duplicate for time being
+             * whenever you need to get list of numbers
+             * TODO make sure to remove duplicates
+             */
+            final Map<String,Object> number = new HashMap<>();
+            number.put("number",cusNumber);
+            firebaseFirestore = firebaseFirestore.getInstance();
+            firebaseFirestore.collection("NUMBERS").add(number);
+
+        }
+
     }
     private void onSend(String sms){
         if(checkPermission(Manifest.permission.SEND_SMS)){
@@ -234,13 +280,13 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
          */
         String message = "ALERT!!! Shortage of stock in inventory!!";
         if(checkPermission(Manifest.permission.SEND_SMS)){
-            onSend(message);
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(ADMIN_PHONE_NUMBER,null,message,null,null);
         }else{
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.SEND_SMS},SEND_SMS_PERMISSION_REQUEST_CODE);
         }
     }
-
     private void adapterClickListener(){
         mAdapter.setOnItemClickListener(new OrderListAdapter.OnItemClickListener() {
             @Override
@@ -374,7 +420,7 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
         List<String> c = Arrays.asList(count);
         List<String> pr = Arrays.asList(price);
 
-        DeliverySaveModel deliverySaveModel = new DeliverySaveModel(date,type,discountGiven,finalBill,customerName,customerPhoneNumber,customerAddress,pn,pt,c,pr);
+        DeliverySaveModel deliverySaveModel = new DeliverySaveModel(date,type,appliedDiscountCode,finalBill,customerName,customerPhoneNumber,customerAddress,pn,pt,c,pr);
         firebaseFirestore = firebaseFirestore.getInstance();
         firebaseFirestore.collection("SALES").add(deliverySaveModel)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -393,6 +439,9 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
 
     }
     private void success(){
+        if(!orderList.isEmpty()){
+            saveOnGoingDelivery();
+        }
         int i = 0;
         while (!orderList.isEmpty()){
             orderList.remove(i); //for updating order list view
@@ -402,12 +451,44 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
             cusName.setText("");
             cusAddress.setText("");
             cusPhNumber.setText("");
+            deliveryBoyName.setText("");
+            deliveryBoyNumber.setText("");
             discount.setText("Discount ?");
             total.setText("Rs. 0");
             mAdapterForCuurentOrder = new CurrentOrderListAdapter(orderList);
             mRecyclerViewForCuurentOrder.setLayoutManager(mLayoutManagerForCuurentOrder);
             mRecyclerViewForCuurentOrder.setAdapter(mAdapterForCuurentOrder);
         }
+    }
+    private void saveOnGoingDelivery(){
+        Map<String,String> onGoingDeliveryList = new HashMap<>();
+        String temp = "";
+        int i = 0;
+        while (!orderList.isEmpty()){
+            temp = temp + (orderList.get(i).getCount() + " " + orderList.get(i).getProductName() + "\n");
+            orderList.remove(i);
+        }
+        onGoingDeliveryList.put("list",temp);
+        if(billAfterDiscount == 0){
+            String deliveryDetail = cusName.getText().toString() + "\n" + cusPhNumber.getText().toString() + "\n" + cusAddress.getText().toString() + "\n";
+            onGoingDeliveryList.put("bill",deliveryDetail + "Rs: " + String.valueOf(totalBill));
+        }else{
+            String deliveryDetail = cusName.getText().toString() + "\n" + cusPhNumber.getText().toString() + "\n" + cusAddress.getText().toString() + "\n";
+            onGoingDeliveryList.put("bill",deliveryDetail + "Rs: " +String.valueOf(billAfterDiscount));
+        }
+        firebaseFirestore = firebaseFirestore.getInstance();
+        firebaseFirestore.collection("ON_GOING_DELIVERY").add(onGoingDeliveryList)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("error",e.toString());
+                    }
+                });
     }
     private boolean validateOrder(){
         final boolean[] validate = {true};
@@ -417,7 +498,7 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
             for(int j=0; j<orderList.size();j++){
                 int index = orderList.get(j).getIname().indexOf(inventoryList.get(i).name);
                 int count = Integer.parseInt(orderList.get(j).getCount());
-                if(index > 0){
+                if(index >= 0){
                     sum = sum + (count*Integer.parseInt(orderList.get(j).getIquantity().get(index)));
                 }
             }
@@ -445,6 +526,7 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
                                         then just place 0 and keep placing orders
                                          */
                                         validate[0] = false;
+                                        notifyAdmin();
                                         availableQuantity = 0;
                                         collectionReference1.document(docID).update("quantity",availableQuantity);
                                     }
@@ -460,7 +542,17 @@ public class HomeDelivery extends AppCompatActivity implements ApplyDiscountDial
         if(!TextUtils.isEmpty(cusName.getText().toString())){
             if(!TextUtils.isEmpty(cusPhNumber.getText().toString())){
                 if(!TextUtils.isEmpty(cusAddress.getText().toString())){
-                    return true;
+                    if(!TextUtils.isEmpty(deliveryBoyName.getText().toString())) {
+                        if(!TextUtils.isEmpty(deliveryBoyNumber.getText().toString())){
+                            return true;
+                        }else{
+                            Toast.makeText(this,"Enter Delivery boy number!!", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                    }else{
+                        Toast.makeText(this,"Enter Delivery boy name!!", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
                 }else{
                     Toast.makeText(this,"Enter customer address!!", Toast.LENGTH_SHORT).show();
                     return false;
