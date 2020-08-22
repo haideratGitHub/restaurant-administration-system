@@ -1,9 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#333333"
+    android:orientation="vertical"
     tools:context=".Settings">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:fontFamily="@font/cooperblackbt"
+        android:text="SETTINGS"
+        android:textColor="@android:color/white"
+        android:textSize="24dp"></TextView>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:fontFamily="@font/cooperblackbt"
+        android:text="Username:"
+        android:textColor="#FFDF00"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@android:color/transparent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textSize="@dimen/_20sdp"></TextView>
+    <EditText
+        android:id="@+id/admin_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:inputType="textPersonName"
+        android:textColor="@android:color/black"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@android:color/white"
+        android:padding="10dp"
+        android:textSize="18dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="@dimen/_30sdp"
+        android:fontFamily="@font/cooperblackbt"
+        android:text="Password:"
+        android:textColor="#FFDF00"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@android:color/transparent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textSize="@dimen/_20sdp"></TextView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <EditText
+        android:id="@+id/admin_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:inputType="textPersonName"
+        android:textColor="@android:color/black"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@android:color/white"
+        android:padding="10dp"
+        android:textSize="18dp"/>
+    <Button
+        android:id="@+id/btn_save_admin_details"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_marginTop="36dp"
+        android:fontFamily="@font/cooperblackbt"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:text="SAVE"
+        android:textColor="@android:color/holo_red_dark"
+        android:background="@drawable/round_corners"
+        android:backgroundTint="@color/colorAccent"
+        android:textSize="20dp"
+        android:padding="@dimen/_10sdp"></Button>
+
+</LinearLayout>

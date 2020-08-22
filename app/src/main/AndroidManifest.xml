@@ -29,7 +29,8 @@
         <activity
             android:name=".Menu"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".Settings" />
+        <activity android:name=".Settings"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".Sales"
             android:parentActivityName=".Menu" />
