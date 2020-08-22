@@ -77,6 +77,12 @@ public class AdminDashboard extends AppCompatActivity {
                 gotoHomeDelivery();
             }
         });
+        promotions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gotoPromotions();
+            }
+        });
 
     }
     private void gotoAddUser(){
@@ -105,6 +111,10 @@ public class AdminDashboard extends AppCompatActivity {
     }
     private void gotoHomeDelivery(){
         final Intent intent = new Intent(this,HomeDelivery.class);
+        startActivity(intent);
+    }
+    private void gotoPromotions(){
+        final Intent intent = new Intent(this, Promotions.class);
         startActivity(intent);
     }
 
